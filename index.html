@@ -232,7 +232,7 @@ tbody tr:hover td{background:#f5f5f8;}
 .cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
 .cal-nav{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;}
 .cal-title{font-weight:600;font-size:16px;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;min-height:300px;}
 .cal-day-name{text-align:center;font-size:11px;font-weight:600;color:var(--muted);padding:6px 2px;text-transform:uppercase;letter-spacing:.05em;}
 .cal-day{min-height:64px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:4px;position:relative;cursor:pointer;}
 .cal-day:hover{border-color:var(--blue);}
@@ -244,8 +244,30 @@ tbody tr:hover td{background:#f5f5f8;}
 .cal-event{font-size:10px;background:var(--ink);color:#fff;border-radius:3px;padding:1px 4px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cal-event.hotel{background:var(--gold);}
 .cal-event.flight{background:var(--blue);}
-.cal-event.activity{background:var(--green);}
+.cal-event.activity{background:#b8860b;}
 .cal-event.program{background:var(--purple);}
+.cal-event.class{background:var(--blue);}
+.cal-event.trip{background:var(--green);}
+.cal-event.travel{background:var(--red);}
+.cal-event.free{background:#9ca3af;color:#fff;}
+
+/* SCHEDULE VIEW */
+.sched-week{margin-bottom:18px;}
+.sched-week-header{background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px 10px 0 0;font-weight:700;font-size:14px;display:flex;align-items:center;gap:10px;}
+.sched-week-body{border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;overflow:hidden;}
+.sched-day-row{display:flex;align-items:flex-start;gap:0;border-bottom:1px solid var(--border);}
+.sched-day-row:last-child{border-bottom:none;}
+.sched-day-label{width:90px;min-width:90px;padding:10px 12px;font-size:12px;font-weight:700;color:var(--muted);background:#fafaf8;border-right:1px solid var(--border);line-height:1.4;}
+.sched-day-events{flex:1;padding:8px 12px;display:flex;flex-wrap:wrap;gap:5px;align-items:flex-start;}
+.sched-pill{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap;}
+.sched-pill.program{background:#ede9fe;color:#5b2d8e;}
+.sched-pill.class{background:#dbeafe;color:#1a3a6b;}
+.sched-pill.trip{background:#d1fae5;color:#1a6b3a;}
+.sched-pill.activity{background:#fef3c7;color:#b8860b;}
+.sched-pill.travel{background:#fee2e2;color:#c0392b;}
+.sched-pill.free{background:#f3f4f6;color:#5a5a72;}
+.sched-pill.hotel{background:#fffbf0;color:#b8860b;}
+.sched-pill.flight{background:#e8f0fe;color:#1a3a6b;}
 
 /* CHECK-IN */
 .checkin-box{background:var(--ink);border-radius:16px;padding:28px;text-align:center;color:#fff;}
@@ -318,7 +340,7 @@ tbody tr:hover td{background:#f5f5f8;}
 <div class="guide">
 
 <!-- HERO -->
-<div class="hero"> <div class="hero-tag">Georgia Tech LBAT Japan 2026 — Family Command Center</div> <h1>Owen's Japan Guide</h1> <div class="hero-sub">Beppu · Hiroshima · Kyoto/Osaka · Tokyo &nbsp;·&nbsp; May 15 – July 26, 2026</div>
+<div class="hero"> <div class="hero-tag">Georgia Tech LBAT Japan 2026 — Family Command Center</div> <h1>Owen's Japan Guide</h1> <div class="hero-sub">Beppu · Hiroshima · Kyoto/Osaka · Tokyo &nbsp;·&nbsp; May 15 – July 26, 2026</div> <div class="hero-meta"> <div class="hero-chip done">✓ Flights Booked</div> <div class="hero-chip done">✓ Passport Valid</div> <div class="hero-chip done">✓ Capital One Added</div> <div class="hero-chip" id="heroEsim">⏳ eSIM Needed</div> <div class="hero-chip" id="heroHotels">⏳ Hotels Jul 19–26</div> <div class="hero-chip" id="heroDomFlight">⏳ Domestic Flight Jul 25</div> </div>
 </div>
 
 <!-- PROGRESS -->
@@ -332,7 +354,7 @@ tbody tr:hover td{background:#f5f5f8;}
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- STATUS TAB -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section active" id="status"> <h2>Family Dashboard <span class="kanji">家族</span></h2> <div class="dual-clock"> <div class="clock-box"> <div class="clock-label">🇺🇸 Georgia (EDT)</div> <div class="clock-time" id="clockGA">--:--</div> <div class="clock-date" id="dateGA"></div> </div> <div class="clock-box"> <div class="clock-label">🇯🇵 Japan (JST)</div> <div class="clock-time" id="clockJP">--:--</div> <div class="clock-date" id="dateJP"></div> </div> </div> <div class="card"><div id="countdown">—</div><div class="countdown-label" id="countdownLabel">Loading…</div></div> </div> </div>  
+<div class="section active" id="status"> <h2>Family Dashboard <span class="kanji">家族</span></h2> <div class="dual-clock"> <div class="clock-box"> <div class="clock-label">🇺🇸 Georgia (EDT)</div> <div class="clock-time" id="clockGA">--:--</div> <div class="clock-date" id="dateGA"></div> </div> <div class="clock-box"> <div class="clock-label">🇯🇵 Japan (JST)</div> <div class="clock-time" id="clockJP">--:--</div> <div class="clock-date" id="dateJP"></div> </div> </div> <div class="card"><div id="countdown">—</div><div class="countdown-label">days until Owen boards his flight (May 15)</div></div> </div> </div>  
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
@@ -397,6 +419,23 @@ tbody tr:hover td{background:#f5f5f8;}
     <div class="tip-block"><strong>Laundry tip:</strong> AP House has machines on every floor — pack for 5–7 days and do laundry weekly. Bring detergent pods for the first week. Japanese dryers run hot — avoid anything that shrinks easily.</div>
     <div class="alert-block"><strong>Skip the heavy jeans and bulky sweaters</strong> — Beppu summer is hot and humid. Pack light fabrics you can layer.</div>
   </div> <div class="card"> <div class="card-header"><div class="card-title">📱 Apps to Install</div></div> <ul class="checklist"> <li data-id="app-line"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('app-line')"></div></div><div class="cb-text">LINE — install and set up profile with full name + photo</div></li> <li data-id="app-gmaps"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('app-gmaps')"></div></div><div class="cb-text">Google Maps — download offline maps for Beppu, Fukuoka, Hiroshima, Kyoto, Tokyo</div></li> <li data-id="app-translate"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('app-translate')"></div></div><div class="cb-text">Google Translate — download Japanese offline language pack</div></li> <li data-id="app-navitime"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('app-navitime')"></div></div><div class="cb-text">Navitime / Japan Transit Planner</div></li> <li data-id="app-cap1"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('app-cap1')"></div></div><div class="cb-text">Banking app — set travel notification and spending alerts</div></li> </ul> </div>
+
+  <!-- CUSTOM ITEMS CARD -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">➕ My Additional Items</div>
+      <div class="badge badge-purple">Custom</div>
+    </div>
+    <ul class="checklist" id="customItemsList">
+      <li id="customItemsEmpty" style="color:var(--muted);font-size:13px;font-style:italic;padding:8px 0;border-bottom:none;">No custom items yet — add one below.</li>
+    </ul>
+    <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
+      <input class="form-input" id="customItemInput" type="text" placeholder="Add a prep item…"
+        style="flex:1;font-size:14px;" onkeydown="if(event.key==='Enter')addCustomItem()">
+      <button class="btn-primary" onclick="addCustomItem()" style="white-space:nowrap;padding:9px 18px;font-size:13px;">+ Add</button>
+    </div>
+  </div>
+
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
@@ -434,7 +473,39 @@ tbody tr:hover td{background:#f5f5f8;}
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- CALENDAR TAB -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section" id="calendar"> <h2>Calendar <span class="kanji">カレンダー</span></h2> <div class="card"> <div class="cal-header"> <button class="cal-nav" onclick="calNav(-1)">← Prev</button> <div class="cal-title" id="calTitle"></div> <button class="cal-nav" onclick="calNav(1)">Next →</button> </div> <div class="cal-grid" id="calGrid"></div> </div> <div class="tip-block">Program dates are pre-loaded in purple. Your itinerary bookings appear automatically as you add them.</div>
+<div class="section" id="calendar">
+  <h2>Calendar <span class="kanji">カレンダー</span></h2>
+
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="showCalView('monthView',this)">📅 Month View</button>
+    <button class="inner-tab" onclick="showCalView('scheduleView',this)">📋 Program Schedule</button>
+  </div>
+
+  <!-- MONTH VIEW -->
+  <div id="monthView">
+    <div class="card">
+      <div class="cal-header">
+        <button class="cal-nav" onclick="calNav(-1)">← Prev</button>
+        <div class="cal-title" id="calTitle"></div>
+        <button class="cal-nav" onclick="calNav(1)">Next →</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;font-size:12px;">
+      <span style="background:#ede9fe;color:#5b2d8e;border-radius:6px;padding:3px 10px;font-weight:600;">🎌 Program</span>
+      <span style="background:#dbeafe;color:#1a3a6b;border-radius:6px;padding:3px 10px;font-weight:600;">📚 Class</span>
+      <span style="background:#d1fae5;color:#1a6b3a;border-radius:6px;padding:3px 10px;font-weight:600;">🚌 Trip</span>
+      <span style="background:#fef3c7;color:#b8860b;border-radius:6px;padding:3px 10px;font-weight:600;">🎭 Activity</span>
+      <span style="background:#fee2e2;color:#c0392b;border-radius:6px;padding:3px 10px;font-weight:600;">✈ Travel</span>
+      <span style="background:#f3f4f6;color:#5a5a72;border-radius:6px;padding:3px 10px;font-weight:600;">🆓 Free</span>
+    </div>
+    <div class="tip-block" style="margin-top:10px;">Events pre-loaded from the official 2026 LBAT schedule. Itinerary bookings added by Owen or family appear automatically and sync in real time.</div>
+  </div>
+
+  <!-- PROGRAM SCHEDULE VIEW -->
+  <div id="scheduleView" style="display:none;">
+    <div id="scheduleList"></div>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
@@ -495,7 +566,42 @@ tbody tr:hover td{background:#f5f5f8;}
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- INFO TAB (combined arrival, tips, apps, phrases) -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section" id="info"> <h2>Travel Info <span class="kanji">情報</span></h2> <div class="inner-tabs"> <button class="inner-tab active" onclick="showInner('infoArrival',this)">✈ Arrival</button> <button class="inner-tab" onclick="showInner('infoSolo',this)">🚃 Transport</button> <button class="inner-tab" onclick="showInner('infoTips',this)">📋 Tips</button> <button class="inner-tab" onclick="showInner('infoApps',this)">📱 Apps</button> <button class="inner-tab" onclick="showInner('infoPhrases',this)">🗣 Phrases</button> </div> <div id="infoArrival"> <div class="card"> <div class="card-header"><div class="card-title">🛂 Immigration</div></div> <div class="tip-block">Full immigration guidance shared directly with Owen.</div> </div> <div class="card"> <div class="card-header"><div class="card-title">🗾 May 17 Rendezvous</div></div> <p>Owen lands Fukuoka <strong>May 16 at 7:55pm</strong>. Program meets at <strong>7:00pm May 17</strong> at Fukuoka Airport domestic terminal. He has a free day to explore Fukuoka.</p> <div class="tip-block">Arrive at domestic terminal by 6:30pm. Bus to Beppu departs promptly — do NOT be late.</div> </div> </div> <div id="infoSolo" style="display:none;">
+<div class="section" id="info"> <h2>Travel Info <span class="kanji">情報</span></h2> <div class="inner-tabs"> <button class="inner-tab active" onclick="showInner('infoArrival',this)">✈ Arrival</button> <button class="inner-tab" onclick="showInner('infoSolo',this)">🚃 Transport</button> <button class="inner-tab" onclick="showInner('infoTips',this)">📋 Tips</button> <button class="inner-tab" onclick="showInner('infoApps',this)">📱 Apps</button> <button class="inner-tab" onclick="showInner('infoPhrases',this)">🗣 Phrases</button> </div> <div id="infoArrival">
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">🛂 Visit Japan Web — Do This Before You Board</div><div class="badge badge-red">Required</div></div>
+    <p style="font-size:14px;line-height:1.65;margin-bottom:10px;">Pre-register your customs and immigration declaration before departure. Shows a QR code at the airport — skips the paper forms entirely and cuts immigration wait time significantly.</p>
+    <a href="https://vjw-lp.digital.go.jp/en/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;">🌐 Open Visit Japan Web →</a>
+    <div class="tip-block" style="margin-top:12px;">Register both <strong>Immigration</strong> and <strong>Customs Declaration</strong> sections. Have your flight number, accommodation address (Haneda layover counts as transit — enter APU address for final destination), and passport handy.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">🛂 Immigration</div></div>
+    <div class="tip-block">Full immigration guidance shared directly with Owen.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">🚇 Get a Suica IC Card — Yes, Do It</div><div class="badge badge-green">Recommended</div></div>
+    <p style="font-size:14px;line-height:1.65;margin-bottom:10px;">A Suica is a rechargeable transit card that works on virtually every train, subway, and bus in Japan — and also pays for convenience store purchases, vending machines, and lockers. Much faster than buying tickets each time.</p>
+    <div class="budget-row"><div class="budget-label">Where to get it</div><div class="budget-amt">Haneda Airport — any JR ticket machine, Terminal 3</div></div>
+    <div class="budget-row"><div class="budget-label">Or on iPhone</div><div class="budget-amt">Wallet app → Add Card → Suica (digital, instant)</div></div>
+    <div class="budget-row"><div class="budget-label">Initial load</div><div class="budget-amt">¥2,000–3,000 to start (~$13–20)</div></div>
+    <div class="budget-row"><div class="budget-label">Works in</div><div class="budget-amt">Tokyo, Fukuoka, Beppu, Hiroshima, Kyoto — everywhere</div></div>
+    <div class="tip-block">Add it to Apple Wallet and tap your phone to the reader — fastest way to board. Top up at any convenience store or JR machine.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">🗾 May 17 — Your Free Day in Fukuoka</div><div class="badge badge-blue">Top 3 Things</div></div>
+    <p style="font-size:14px;line-height:1.65;margin-bottom:12px;">Owen lands May 16 at 7:55pm and has a full free day before the program rendezvous at 7pm on May 17. Fukuoka is one of Japan's best food cities — make the most of it.</p>
+    <div class="status-bar">
+      <div class="status-row"><div class="status-dot dot-green"></div><div><strong>① Hakata Ramen at Ichiran or Shin-Shin</strong><br><span style="font-size:13px;color:var(--muted);">Fukuoka invented tonkotsu ramen. Ichiran has solo booths (perfect for first timers), Shin-Shin is a local favorite near Tenjin. Breakfast, lunch, or dinner — doesn't matter.</span></div></div>
+      <div class="status-row"><div class="status-dot dot-green"></div><div><strong>② Ohori Park & Fukuoka Castle Ruins</strong><br><span style="font-size:13px;color:var(--muted);">A 20-min walk or short subway ride from Hakata. Great for a relaxed morning walk to shake off jet lag. The castle ruins have great city views and almost no tourists.</span></div></div>
+      <div class="status-row"><div class="status-dot dot-green"></div><div><strong>③ Tenjin Underground Shopping City (天神地下街)</strong><br><span style="font-size:13px;color:var(--muted);">A massive underground mall connecting subway stations — perfect for picking up any last-minute items, Japanese snacks, or cheap clothes. Air conditioned and fascinating to explore.</span></div></div>
+    </div>
+    <div class="tip-block">⚠️ Rendezvous is at <strong>Fukuoka Airport domestic terminal at 7:00pm</strong>. Arrive by 6:30pm. The bus to Beppu departs promptly — do NOT be late.</div>
+  </div>
+
+ </div> <div id="infoSolo" style="display:none;">
 
   <div class="card">
     <div class="card-header"><div class="card-title">🚕 Taxis</div></div>
@@ -667,7 +773,7 @@ const state = {};
 function setSyncStatus(s){ const dot=document.getElementById('syncDot'),lbl=document.getElementById('syncLabel'); if(!dot||!lbl)return; dot.className='sync-dot'+(s==='live'?' live':s==='saving'?' saving':s==='error'?' error':''); lbl.textContent=s==='live'?'Live sync':s==='saving'?'Saving…':s==='error'?'Offline':'Loading…';
 }
 
-function updateProgress(){ const all=document.querySelectorAll('li[data-id]'); const done=[...all].filter(li=>state[li.dataset.id]===true); const pct=all.length?Math.round(done.length/all.length*100):0; const bar=document.getElementById('progressBar'),pctEl=document.getElementById('progressPct'); if(bar)bar.style.width=pct+'%'; if(pctEl)pctEl.textContent=pct+'%';
+function updateProgress(){ const all=document.querySelectorAll('li[data-id]'); const customIds=Object.keys(customItems||{}); const allCount=all.length+customIds.length; const stdDone=[...all].filter(li=>state[li.dataset.id]===true).length; const custDone=customIds.filter(id=>(customItems[id]||{}).checked).length; const pct=allCount?Math.round((stdDone+custDone)/allCount*100):0; const bar=document.getElementById('progressBar'),pctEl=document.getElementById('progressPct'); if(bar)bar.style.width=pct+'%'; if(pctEl)pctEl.textContent=pct+'%';
 }
 
 function applyState(id,checked){ const li=document.querySelector('li[data-id="'+id+'"]'); if(!li)return; const box=li.querySelector('.cb-box'),text=li.querySelector('.cb-text'); if(!box||!text)return; if(checked){box.classList.add('checked');text.classList.add('checked');} else{box.classList.remove('checked');text.classList.remove('checked');}
@@ -676,10 +782,87 @@ function applyState(id,checked){ const li=document.querySelector('li[data-id="'+
 async function toggleById(id){ const newVal=!(state[id]===true); state[id]=newVal; applyState(id,newVal); updateProgress(); setSyncStatus('saving'); try{ const{error}=await sb.from('checklist').upsert({id,checked:newVal,updated_at:new Date().toISOString()},{onConflict:'id'}); if(error)throw error; setSyncStatus('live'); }catch(e){console.error('Error:', e?.message || JSON.stringify(e));setSyncStatus('error');}
 }
 
-async function loadChecklist(){ setSyncStatus('loading'); try{ const{data,error}=await sb.from('checklist').select('id,checked'); if(error)throw error; (data||[]).forEach(row=>{state[row.id]=row.checked;applyState(row.id,row.checked);}); updateProgress();setSyncStatus('live'); }catch(e){console.error('Error:', e?.message || JSON.stringify(e));setSyncStatus('error');}
+async function loadChecklist(){ setSyncStatus('loading'); try{ const{data,error}=await sb.from('checklist').select('id,checked,custom_text'); if(error)throw error; (data||[]).forEach(row=>{ if(row.custom_text){customItems[row.id]={text:row.custom_text,checked:row.checked};}else{state[row.id]=row.checked;applyState(row.id,row.checked);} }); updateProgress();renderCustomItems();setSyncStatus('live'); }catch(e){console.error('Error:', e?.message || JSON.stringify(e));setSyncStatus('error');}
 }
 
-function subscribeRealtime(){ sb.channel('checklist-live') .on('postgres_changes',{event:'*',schema:'public',table:'checklist'},payload=>{ const{id,checked}=payload.new||{}; if(!id)return; state[id]=checked;applyState(id,checked);updateProgress(); }) .subscribe(s=>{if(s==='SUBSCRIBED')setSyncStatus('live');});
+function subscribeRealtime(){ sb.channel('checklist-live') .on('postgres_changes',{event:'*',schema:'public',table:'checklist'},payload=>{ const{id,checked,custom_text}=payload.new||{}; if(!id)return; if(custom_text){customItems[id]={text:custom_text,checked};renderCustomItems();}else if(payload.eventType==='DELETE'){delete customItems[id];delete state[id];renderCustomItems();updateProgress();}else{state[id]=checked;applyState(id,checked);updateProgress();} }) .subscribe(s=>{if(s==='SUBSCRIBED')setSyncStatus('live');});
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// CUSTOM CHECKLIST ITEMS
+// ═══════════════════════════════════════════════════════════
+const customItems = {};
+
+function renderCustomItems() {
+  const list = document.getElementById('customItemsList');
+  const empty = document.getElementById('customItemsEmpty');
+  if (!list) return;
+  list.querySelectorAll('li.custom-item').forEach(el => el.remove());
+  const ids = Object.keys(customItems);
+  if (!ids.length) { if (empty) empty.style.display = ''; return; }
+  if (empty) empty.style.display = 'none';
+  ids.forEach(id => {
+    const item = customItems[id];
+    const li = document.createElement('li');
+    li.className = 'custom-item';
+    li.dataset.id = id;
+    li.innerHTML = `
+      <div class="cb-wrap"><div class="cb-box${item.checked ? ' checked' : ''}" onclick="toggleCustomItem('${id}')"></div></div>
+      <div class="cb-text${item.checked ? ' checked' : ''}" style="flex:1;">${item.text}</div>
+      <button onclick="deleteCustomItem('${id}')" title="Remove" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:17px;padding:2px 6px;line-height:1;flex-shrink:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">✕</button>
+    `;
+    list.appendChild(li);
+  });
+  updateProgress();
+}
+
+async function addCustomItem() {
+  const input = document.getElementById('customItemInput');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  const id = 'custom-' + Date.now();
+  customItems[id] = { text, checked: false };
+  input.value = '';
+  renderCustomItems();
+  setSyncStatus('saving');
+  try {
+    const { error } = await sb.from('checklist').upsert(
+      { id, checked: false, custom_text: text, updated_at: new Date().toISOString() },
+      { onConflict: 'id' }
+    );
+    if (error) throw error;
+    setSyncStatus('live');
+  } catch(e) { console.error(e?.message); setSyncStatus('error'); }
+}
+
+async function toggleCustomItem(id) {
+  const item = customItems[id];
+  if (!item) return;
+  item.checked = !item.checked;
+  renderCustomItems();
+  setSyncStatus('saving');
+  try {
+    const { error } = await sb.from('checklist').upsert(
+      { id, checked: item.checked, custom_text: item.text, updated_at: new Date().toISOString() },
+      { onConflict: 'id' }
+    );
+    if (error) throw error;
+    setSyncStatus('live');
+  } catch(e) { console.error(e?.message); setSyncStatus('error'); }
+}
+
+async function deleteCustomItem(id) {
+  delete customItems[id];
+  delete state[id];
+  renderCustomItems();
+  setSyncStatus('saving');
+  try {
+    const { error } = await sb.from('checklist').delete().eq('id', id);
+    if (error) throw error;
+    setSyncStatus('live');
+  } catch(e) { console.error(e?.message); setSyncStatus('error'); }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -784,20 +967,263 @@ async function loadItinerary(){
 
 
 async function loadCalendar(){
+  renderCalendar([]); // always render program events immediately, even if itin fetch fails
   try{
     const{data}=await sb.from('itinerary').select('*').order('start',{ascending:true});
     renderCalendar(data||[]);
   }catch(e){console.error('Error:', e?.message || JSON.stringify(e));}
 }
 
-let calYear=2026,calMonth=4;
-function calNav(dir){calMonth+=dir;if(calMonth>11){calMonth=0;calYear++;}else if(calMonth<0){calMonth=11;calYear--;}loadCalendar();}
+// ═══════════════════════════════════════════════════════════
+// PROGRAM EVENTS (from 2026 LBAT Schedule)
+// ═══════════════════════════════════════════════════════════
+const PROGRAM_EVENTS = [
+  // Arrival & orientation
+  {date:'2026-05-16',label:'✈ Arrive Fukuoka',type:'program'},
+  {date:'2026-05-17',label:'🚌 Program Rendezvous 7pm',type:'program'},
+  // Week 1 (May 18–24)
+  {date:'2026-05-18',label:'📝 Pre-LBAT Japanese Test',type:'class'},
+  {date:'2026-05-18',label:'🏙 Beppu City Tour',type:'activity'},
+  {date:'2026-05-19',label:'💬 Conversation Practicum 1',type:'class'},
+  {date:'2026-05-19',label:'📋 Beppu Orientation',type:'activity'},
+  {date:'2026-05-20',label:'🗺 Orientation / Scavenger Hunt',type:'activity'},
+  {date:'2026-05-20',label:'🎌 オリエンテーション',type:'class'},
+  {date:'2026-05-21',label:'💬 Conversation Practicum 2',type:'class'},
+  {date:'2026-05-21',label:'📚 科学技術日本語 1 & 2',type:'class'},
+  {date:'2026-05-22',label:'💬 Conversation Practicum 3',type:'class'},
+  {date:'2026-05-22',label:'📚 科学技術日本語 3 & 4',type:'class'},
+  {date:'2026-05-23',label:'🆓 Free Day',type:'free'},
+  {date:'2026-05-24',label:'🆓 Free Day',type:'free'},
+  // Week 2 (May 25–31)
+  {date:'2026-05-25',label:'💬 Conversation Practicum 4',type:'class'},
+  {date:'2026-05-25',label:'📚 科学技術日本語 5 & 6',type:'class'},
+  {date:'2026-05-26',label:'📚 科学技術日本語 7 & 8',type:'class'},
+  {date:'2026-05-27',label:'🚌 鹿児島旅行 (Kagoshima Trip)',type:'trip'},
+  {date:'2026-05-28',label:'🚌 鹿児島旅行 (Kagoshima Trip)',type:'trip'},
+  {date:'2026-05-29',label:'🚌 鹿児島旅行 (Kagoshima Trip)',type:'trip'},
+  {date:'2026-05-31',label:'🆓 Free Day',type:'free'},
+  // Week 3 (Jun 1–7)
+  {date:'2026-06-01',label:'💬 Conversation Practicum 5',type:'class'},
+  {date:'2026-06-01',label:'📚 科学技術日本語 9 & 10',type:'class'},
+  {date:'2026-06-02',label:'🚌 日田 / Attack on Titan Trip',type:'trip'},
+  {date:'2026-06-03',label:'📚 科学技術日本語 11 & 12',type:'class'},
+  {date:'2026-06-04',label:'💬 Conversation Practicum 6',type:'class'},
+  {date:'2026-06-04',label:'📚 科学技術日本語 13 & 14',type:'class'},
+  {date:'2026-06-05',label:'💬 Conversation Practicum 7',type:'class'},
+  {date:'2026-06-05',label:'📚 科学技術日本語 15 & 16',type:'class'},
+  {date:'2026-06-06',label:'🆓 Free Day',type:'free'},
+  {date:'2026-06-07',label:'🆓 Free Day',type:'free'},
+  // Week 4 (Jun 8–14)
+  {date:'2026-06-08',label:'💬 Conversation Practicum 8',type:'class'},
+  {date:'2026-06-08',label:'📚 科学技術日本語 17',type:'class'},
+  {date:'2026-06-08',label:'🍵 茶道 Tea Ceremony',type:'activity'},
+  {date:'2026-06-09',label:'💬 Conversation Practicum 9',type:'class'},
+  {date:'2026-06-09',label:'📚 科学技術日本語 18 & 19',type:'class'},
+  {date:'2026-06-09',label:'✍ 書道 Calligraphy',type:'activity'},
+  {date:'2026-06-10',label:'📚 科学技術日本語 20 & 21',type:'class'},
+  {date:'2026-06-11',label:'📚 科学技術日本語 22 & 23',type:'class'},
+  {date:'2026-06-12',label:'💬 Conversation Practicum 10',type:'class'},
+  {date:'2026-06-12',label:'📚 科学技術日本語 24',type:'class'},
+  {date:'2026-06-13',label:'🆓 Free Day',type:'free'},
+  {date:'2026-06-14',label:'🆓 Free Day',type:'free'},
+  // Week 5 (Jun 15–21)
+  {date:'2026-06-15',label:'🧘 朝日寺 Zen Temple Visit',type:'activity'},
+  {date:'2026-06-15',label:'🏫 Elementary School Visit',type:'activity'},
+  {date:'2026-06-16',label:'💬 Conversation Practicum 11',type:'class'},
+  {date:'2026-06-17',label:'💬 Conversation Practicum 12',type:'class'},
+  {date:'2026-06-17',label:'🤝 バディアクティビティ Buddy Activity',type:'activity'},
+  {date:'2026-06-18',label:'📰 Japan Today 1 & 2',type:'class'},
+  {date:'2026-06-19',label:'💬 Conversation Practicum 13',type:'class'},
+  {date:'2026-06-19',label:'📰 Japan Today 3',type:'class'},
+  {date:'2026-06-19',label:'🌾 ファームステイ Farm Stay',type:'trip'},
+  {date:'2026-06-20',label:'🌾 ファームステイ Farm Stay',type:'trip'},
+  // Week 6 (Jun 22–28)
+  {date:'2026-06-22',label:'💬 Conversation Practicum 14',type:'class'},
+  {date:'2026-06-22',label:'📰 Japan Today 4',type:'class'},
+  {date:'2026-06-23',label:'📰 Japan Today 5 & 6',type:'class'},
+  {date:'2026-06-24',label:'💬 Conversation Practicum 15',type:'class'},
+  {date:'2026-06-24',label:'📰 Japan Today 7',type:'class'},
+  {date:'2026-06-25',label:'📰 Japan Today 8 & 9',type:'class'},
+  {date:'2026-06-26',label:'💬 Conversation Practicum 16',type:'class'},
+  {date:'2026-06-26',label:'📰 Japan Today 10',type:'class'},
+  {date:'2026-06-27',label:'🆓 Free Day',type:'free'},
+  {date:'2026-06-28',label:'🆓 Free Day',type:'free'},
+  // Week 7 (Jun 29 – Jul 5)
+  {date:'2026-06-29',label:'💬 Conversation Practicum 17',type:'class'},
+  {date:'2026-06-29',label:'📰 Japan Today 11',type:'class'},
+  {date:'2026-06-30',label:'💬 Conversation Practicum 18',type:'class'},
+  {date:'2026-06-30',label:'📰 Japan Today 12',type:'class'},
+  {date:'2026-07-01',label:'🚌 福岡旅行 Fukuoka Trip',type:'trip'},
+  {date:'2026-07-02',label:'🚌 福岡旅行 Fukuoka Trip',type:'trip'},
+  {date:'2026-07-04',label:'🆓 Free Day 🇺🇸',type:'free'},
+  {date:'2026-07-05',label:'🆓 Free Day',type:'free'},
+  // Week 8 (Jul 6–12)
+  {date:'2026-07-06',label:'💬 Conversation Practicum 19',type:'class'},
+  {date:'2026-07-06',label:'📰 Japan Today 13',type:'class'},
+  {date:'2026-07-07',label:'📰 Japan Today 14',type:'class'},
+  {date:'2026-07-08',label:'📰 Japan Today 15',type:'class'},
+  {date:'2026-07-09',label:'📰 Japan Today 16',type:'class'},
+  {date:'2026-07-09',label:'🎭 落語 Rakugo Performance',type:'activity'},
+  {date:'2026-07-10',label:'💬 Conversation Practicum 20',type:'class'},
+  {date:'2026-07-10',label:'📰 Japan Today 17',type:'class'},
+  {date:'2026-07-11',label:'🆓 Free Day',type:'free'},
+  {date:'2026-07-12',label:'🆓 Free Day',type:'free'},
+  // Week 9 (Jul 13–19) — Final week
+  {date:'2026-07-13',label:'🎤 Conversation Presentations',type:'class'},
+  {date:'2026-07-13',label:'📰 Japan Today 18',type:'class'},
+  {date:'2026-07-14',label:'📰 Japan Today 19',type:'class'},
+  {date:'2026-07-15',label:'📰 Japan Today 20',type:'class'},
+  {date:'2026-07-16',label:'📝 Post-LBAT Japanese Test',type:'class'},
+  {date:'2026-07-17',label:'🎉 修了式 Graduation Ceremony',type:'program'},
+  {date:'2026-07-17',label:'🍱 Farewell Lunch',type:'activity'},
+  {date:'2026-07-18',label:'🆓 Free Day',type:'free'},
+  {date:'2026-07-19',label:'✅ Program Ends',type:'program'},
+  {date:'2026-07-26',label:'✈ Departs Fukuoka 10:45am',type:'program'},
+];
 
-function renderCalendar(itinData){ const title=document.getElementById('calTitle'); const grid=document.getElementById('calGrid'); const months=['January','February','March','April','May','June','July','August','September','October','November','December']; title.textContent=months[calMonth]+' '+calYear; const firstDay=new Date(calYear,calMonth,1).getDay(); const daysInMonth=new Date(calYear,calMonth+1,0).getDate(); const today=new Date(); // Build event map const evMap={}; PROGRAM_EVENTS.forEach(e=>{if(!evMap[e.date])evMap[e.date]=[];evMap[e.date].push({label:e.label,type:e.type});}); itinData.forEach(e=>{ const dates=getDatesInRange(e.start,e.end||e.start); dates.forEach(d=>{if(!evMap[d])evMap[d]=[];evMap[d].push({label:e.title,type:e.type});}); }); let html=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-day-name">${d}</div>`).join(''); // Empty cells before first day for(let i=0;i<firstDay;i++)html+=`<div class="cal-day other-month"></div>`; for(let d=1;d<=daysInMonth;d++){ const dateStr=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); const isToday=today.getFullYear()===calYear&&today.getMonth()===calMonth&&today.getDate()===d; const events=evMap[dateStr]||[]; const hasEv=events.length>0; html+=`<div class="cal-day${isToday?' today':''}${hasEv?' has-event':''}"> ${isToday?'<div class="cal-today-dot"></div>':''} <div class="cal-date">${d}</div> ${events.slice(0,2).map(e=>`<div class="cal-event ${e.type||''}">${e.label}</div>`).join('')} ${events.length>2?`<div style="font-size:9px;color:var(--muted);">+${events.length-2} more</div>`:''} </div>`; } grid.innerHTML=html;
+let calYear=2026,calMonth=4; // start on May 2026
+const CAL_MIN_MONTH=4, CAL_MAX_MONTH=6; // May=4, Jul=6 (0-indexed), year fixed 2026
+function calNav(dir){
+  const next=calMonth+dir;
+  if(next<CAL_MIN_MONTH||next>CAL_MAX_MONTH)return;
+  calMonth=next;
+  loadCalendar();
+}
+function updateCalNavBtns(){
+  const btns = document.querySelectorAll('#calendar .cal-nav');
+  if(btns[0]){ btns[0].disabled = calMonth<=CAL_MIN_MONTH; btns[0].style.opacity = btns[0].disabled?'0.3':''; btns[0].style.cursor = btns[0].disabled?'default':''; }
+  if(btns[1]){ btns[1].disabled = calMonth>=CAL_MAX_MONTH; btns[1].style.opacity = btns[1].disabled?'0.3':''; btns[1].style.cursor = btns[1].disabled?'default':''; }
 }
 
-function getDatesInRange(start,end){ const dates=[]; let cur=new Date(start); const last=new Date(end); while(cur<=last){dates.push(cur.toISOString().split('T')[0]);cur.setDate(cur.getDate()+1);} return dates;
+function renderCalendar(itinData) {
+  const title = document.getElementById('calTitle');
+  const grid = document.getElementById('calGrid');
+  if (!title || !grid) return;
+
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  title.textContent = months[calMonth] + ' ' + calYear;
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const today = new Date();
+
+  // Build event map from program events
+  const evMap = {};
+  PROGRAM_EVENTS.forEach(e => {
+    if (!evMap[e.date]) evMap[e.date] = [];
+    evMap[e.date].push({label: e.label, type: e.type});
+  });
+
+  // Merge in itinerary entries
+  (itinData || []).forEach(e => {
+    const dates = getDatesInRange(e.start, e.end || e.start);
+    dates.forEach(d => {
+      if (!evMap[d]) evMap[d] = [];
+      evMap[d].push({label: e.title, type: e.type});
+    });
+  });
+
+  // Day name headers
+  let html = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+    .map(d => '<div class="cal-day-name">' + d + '</div>')
+    .join('');
+
+  // Empty cells before first day
+  for (let i = 0; i < firstDay; i++) {
+    html += '<div class="cal-day other-month"></div>';
+  }
+
+  // Day cells
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = calYear + '-' + String(calMonth + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const isToday = today.getFullYear() === calYear && today.getMonth() === calMonth && today.getDate() === d;
+    const events = evMap[dateStr] || [];
+    const hasEv = events.length > 0;
+
+    html += '<div class="cal-day' + (isToday ? ' today' : '') + (hasEv ? ' has-event' : '') + '">';
+    if (isToday) html += '<div class="cal-today-dot"></div>';
+    html += '<div class="cal-date">' + d + '</div>';
+    events.slice(0, 2).forEach(e => {
+      html += '<div class="cal-event ' + (e.type || '') + '">' + e.label + '</div>';
+    });
+    if (events.length > 2) {
+      html += '<div style="font-size:9px;color:var(--muted);">+' + (events.length - 2) + ' more</div>';
+    }
+    html += '</div>';
+  }
+
+  grid.innerHTML = html;
+  updateCalNavBtns();
 }
+
+function showCalView(id, btn){
+  document.getElementById('monthView').style.display = id==='monthView' ? '' : 'none';
+  document.getElementById('scheduleView').style.display = id==='scheduleView' ? '' : 'none';
+  document.querySelectorAll('#calendar .inner-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(id==='scheduleView') renderSchedule();
+}
+
+function renderSchedule(){
+  const weeks = [
+    {label:'Week 1', dates:['2026-05-18','2026-05-19','2026-05-20','2026-05-21','2026-05-22','2026-05-23','2026-05-24']},
+    {label:'Week 2', dates:['2026-05-25','2026-05-26','2026-05-27','2026-05-28','2026-05-29','2026-05-30','2026-05-31']},
+    {label:'Week 3', dates:['2026-06-01','2026-06-02','2026-06-03','2026-06-04','2026-06-05','2026-06-06','2026-06-07']},
+    {label:'Week 4', dates:['2026-06-08','2026-06-09','2026-06-10','2026-06-11','2026-06-12','2026-06-13','2026-06-14']},
+    {label:'Week 5', dates:['2026-06-15','2026-06-16','2026-06-17','2026-06-18','2026-06-19','2026-06-20','2026-06-21']},
+    {label:'Week 6', dates:['2026-06-22','2026-06-23','2026-06-24','2026-06-25','2026-06-26','2026-06-27','2026-06-28']},
+    {label:'Week 7', dates:['2026-06-29','2026-06-30','2026-07-01','2026-07-02','2026-07-03','2026-07-04','2026-07-05']},
+    {label:'Week 8', dates:['2026-07-06','2026-07-07','2026-07-08','2026-07-09','2026-07-10','2026-07-11','2026-07-12']},
+    {label:'Week 9 (Final)', dates:['2026-07-13','2026-07-14','2026-07-15','2026-07-16','2026-07-17','2026-07-18','2026-07-19']},
+  ];
+
+  const evMap = {};
+  PROGRAM_EVENTS.forEach(e=>{
+    if(!evMap[e.date]) evMap[e.date]=[];
+    evMap[e.date].push(e);
+  });
+
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  let html = '';
+  weeks.forEach(week=>{
+    html += `<div class="sched-week">
+      <div class="sched-week-header">🗓 ${week.label} &nbsp;<span style="font-weight:400;opacity:.65;font-size:12px;">${formatDateRange(week.dates[0],week.dates[week.dates.length-1])}</span></div>
+      <div class="sched-week-body">`;
+    week.dates.forEach(d=>{
+      const dt = new Date(d+'T12:00:00');
+      const dayName = dayNames[dt.getDay()];
+      const dayLabel = monthNames[dt.getMonth()]+'&nbsp;'+dt.getDate();
+      const events = evMap[d]||[];
+      const isWeekend = dt.getDay()===0||dt.getDay()===6;
+      html += `<div class="sched-day-row" style="${isWeekend?'background:#fafaf8':''}">
+        <div class="sched-day-label" style="${isWeekend?'color:var(--muted);':''}">${dayName}<br>${dayLabel}</div>
+        <div class="sched-day-events">`;
+      if(events.length===0){
+        html += `<span style="font-size:12px;color:var(--border);font-style:italic;">—</span>`;
+      } else {
+        events.forEach(e=>{
+          html += `<span class="sched-pill ${e.type||'other'}">${e.label}</span>`;
+        });
+      }
+      html += `</div></div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  document.getElementById('scheduleList').innerHTML = html;
+}
+
+function getDatesInRange(start,end){ const dates=[]; let cur=new Date(start+'T12:00:00'); const last=new Date(end+'T12:00:00'); while(cur<=last){dates.push(cur.toISOString().split('T')[0]);cur.setDate(cur.getDate()+1);} return dates; }
+
+function formatDateRange(d1, d2){
+  const a = new Date(d1+'T12:00:00'), b = new Date(d2+'T12:00:00');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${months[a.getMonth()]} ${a.getDate()} – ${months[b.getMonth()]} ${b.getDate()}`;
+}
+
+
 
 // ═══════════════════════════════════════════════════════════
 // MAP — Google Maps
@@ -884,6 +1310,9 @@ function initGoogleMap() {
 
     gmapMarkers[loc.id] = { marker, infoWindow };
   });
+
+  google.maps.event.trigger(gmap, 'resize');
+  loadMapState();
 }
 
 function loadGoogleMapsScript() {
@@ -1011,112 +1440,29 @@ function updateClocks(){ const now=new Date(); const ga=now.toLocaleTimeString('
 // ═══════════════════════════════════════════════════════════
 const TABS=['status','flights','checklist','money','itinerary','calendar','map','emergency','info'];
 
-function showTab(id){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn')[TABS.indexOf(id)].classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); if(id==='calendar')loadCalendar(); if(id==='itinerary')loadItinerary(); if(id==='map'){loadMapState();loadJournal();} if(id==='checkin')loadCheckins();
+function showTab(id){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn')[TABS.indexOf(id)].classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); if(id==='calendar')loadCalendar(); if(id==='itinerary')loadItinerary(); if(id==='map'){loadGoogleMapsScript();loadJournal();loadMapState();setTimeout(()=>{if(gmap){google.maps.event.trigger(gmap,'resize');}},200);} if(id==='checkin')loadCheckins();
 }
 
 function showInner(id,btn){ const parent=btn.closest('.section'); parent.querySelectorAll('[id^="info"],[id^="map"],[id^="journal"]').forEach(el=>{ if(el.id!==id&&(el.id.startsWith('info')||el.id==='mapView'||el.id==='journalView'))el.style.display='none'; }); document.getElementById(id).style.display=''; parent.querySelectorAll('.inner-tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
 }
 
 // ═══════════════════════════════════════════════════════════
-// COUNTDOWN — multi-phase
+// COUNTDOWN
 // ═══════════════════════════════════════════════════════════
-const CD_DEPART        = new Date('2026-05-15T05:30:00-04:00');   // Boards ATL (EDT)
-const CD_LAND_JP       = new Date('2026-05-16T19:55:00+09:00');   // Lands Fukuoka (JST)
-const CD_RETURN_DEPART = new Date('2026-07-26T10:45:00+09:00');   // Departs Fukuoka (JST)
-const CD_RETURN_PACIFIC= new Date('2026-07-26T15:45:00+09:00');   // Departs Haneda across Pacific (JST)
-const CD_HOME          = new Date('2026-07-26T19:16:00-04:00');   // Lands ATL (EDT)
+const dep=new Date('2026-05-15T05:30:00');
+const diff=Math.ceil((dep-new Date())/86400000);
+const countEl=document.getElementById('countdown');
+if(countEl)countEl.textContent=diff>0?diff:'✈';
 
-function updateCountdown(){
-  const countEl = document.getElementById('countdown');
-  const labelEl = document.getElementById('countdownLabel');
-  if(!countEl || !labelEl) return;
-
-  const now = new Date();
-
-  if(now < CD_DEPART){
-    // Phase 1 — pre-departure
-    const days = Math.ceil((CD_DEPART - now) / 86400000);
-    countEl.style.color = 'var(--red)';
-    countEl.textContent = days;
-    labelEl.textContent = 'days until Owen boards his flight (May 15)';
-
-  } else if(now < CD_LAND_JP){
-    // Phase 2 — flying to Japan
-    const hoursLeft = Math.ceil((CD_LAND_JP - now) / 3600000);
-    countEl.style.color = 'var(--blue)';
-    countEl.textContent = '✈';
-    labelEl.textContent = `Owen is on his way to Japan! Lands Fukuoka in ~${hoursLeft} hour${hoursLeft!==1?'s':''} 🇯🇵`;
-
-  } else if(now < CD_RETURN_DEPART){
-    // Phase 3 — in Japan, counting down to departure
-    const daysIn   = Math.floor((now - CD_LAND_JP) / 86400000) + 1;
-    const daysLeft = Math.ceil((CD_RETURN_DEPART - now) / 86400000);
-    countEl.style.color = 'var(--green)';
-    countEl.textContent = daysLeft;
-    labelEl.textContent = `days until Owen leaves Japan · Day ${daysIn} in Japan 🎌`;
-
-  } else if(now < CD_RETURN_PACIFIC){
-    // Phase 4 — Fukuoka → Haneda domestic leg
-    countEl.style.color = 'var(--blue)';
-    countEl.textContent = '✈';
-    labelEl.textContent = 'Owen is flying home — Fukuoka → Tokyo Haneda right now ✈';
-
-  } else if(now < CD_HOME){
-    // Phase 5 — crossing the Pacific home
-    const hoursLeft = Math.ceil((CD_HOME - now) / 3600000);
-    countEl.style.color = 'var(--blue)';
-    countEl.textContent = '✈';
-    labelEl.textContent = `Owen is flying home across the Pacific — lands Atlanta in ~${hoursLeft} hour${hoursLeft!==1?'s':''} 🏠`;
-
-  } else {
-    // Phase 6 — home!
-    countEl.style.color = 'var(--green)';
-    countEl.textContent = '🏠';
-    labelEl.textContent = 'Owen is home! Welcome back! 🎉';
-  }
-}
-
-updateCountdown();
-setInterval(updateCountdown, 60000);
-
-// ═══════════════════════════════════════════════════════════
-// ITINERARY PASSWORD
-// ═══════════════════════════════════════════════════════════
-const ITIN_PASSWORD = 'japan2026';
-const ITIN_SESSION_KEY = 'itin_unlocked';
-
-function checkItinPassword(){
-  const val = document.getElementById('itinPasswordInput').value;
-  const err = document.getElementById('itinPasswordError');
-  if(val === ITIN_PASSWORD){
-    sessionStorage.setItem(ITIN_SESSION_KEY, '1');
-    unlockItinerary();
-  } else {
-    err.textContent = 'Incorrect password — try again';
-    document.getElementById('itinPasswordInput').value = '';
-    document.getElementById('itinPasswordInput').focus();
-  }
-}
-
-function unlockItinerary(){
-  document.getElementById('itinGate').style.display = 'none';
-  document.getElementById('itinContent').style.display = 'block';
-  loadItinerary();
-}
-
-function checkItinSession(){
-  if(sessionStorage.getItem(ITIN_SESSION_KEY) === '1'){
-    unlockItinerary();
-  }
-}
+// Password gate removed — itinerary is open to all family members
 
 // ═══════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════
-async function init(){ loadChecklist(); subscribeRealtime(); renderFlights(); loadExchangeRate(); renderCalendar([]); updateClocks(); setInterval(updateClocks,1000); // Real-time subscriptions for other tables sb.channel('itin-live').on('postgres_changes',{event:'*',schema:'public',table:'itinerary'},()=>{loadItinerary();loadCalendar();}).subscribe(); sb.channel('map-live').on('postgres_changes',{event:'*',schema:'public',table:'map_visited'},payload=>{ const{location,visited}=payload.new||{}; if(!location)return; mapState[location]=visited; if(visited)markPinVisited(location);else unmarkPin(location); renderVisitedList(); }).subscribe(); sb.channel('journal-live').on('postgres_changes',{event:'*',schema:'public',table:'journal'},()=>{loadJournal();}).subscribe();
+async function init(){ loadChecklist(); subscribeRealtime(); renderFlights(); loadExchangeRate(); loadCalendar(); updateClocks(); setInterval(updateClocks,1000); // Real-time subscriptions for other tables sb.channel('itin-live').on('postgres_changes',{event:'*',schema:'public',table:'itinerary'},()=>{loadItinerary();loadCalendar();}).subscribe(); sb.channel('map-live').on('postgres_changes',{event:'*',schema:'public',table:'map_visited'},payload=>{ const{location,visited}=payload.new||{}; if(!location)return; mapState[location]=visited; if(gmap) refreshMapMarkers(); renderVisitedList(); }).subscribe(); sb.channel('journal-live').on('postgres_changes',{event:'*',schema:'public',table:'journal'},()=>{loadJournal();}).subscribe();
 }
 
-init();
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
 
 // Suppress DataCloneError from Supabase realtime in some browser contexts
 window.addEventListener('unhandledrejection', e => {
@@ -1126,147 +1472,5 @@ window.addEventListener('unhandledrejection', e => {
   }
 });
 </script>
-</body>
-</html>
-
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- FLIGHTS TAB -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section" id="flights"> <h2>Owen's Flights <span class="kanji">飛行機</span></h2> <!-- BOOKING SUMMARY --> <div class="card" style="background:var(--ink);color:#fff;border:none;"> <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;"> <div> <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px;">Booking Summary</div> <div style="font-size:18px;font-weight:700;">All Nippon Airways / United</div> <div style="font-size:14px;color:rgba(255,255,255,0.6);margin-top:4px;">Atlanta ↔ Fukuoka · Economy</div> </div> <div style="text-align:right;"> <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:4px;">Traveler</div> <div style="font-weight:700;"></div> <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:6px;"></div> </div> </div> <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;border-top:1px solid rgba(255,255,255,0.15);padding-top:14px;"> <div> <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:3px;">ANA Confirmation</div> <div style="font-weight:700;font-size:15px;color:#f9c74f;">••••••</div> </div> <div> <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:3px;">Expedia Itinerary</div> <div style="font-weight:700;font-size:15px;color:#f9c74f;"></div> </div> <div> <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:3px;">Booking Details</div> <div style="font-weight:700;font-size:15px;color:#f9c74f;"></div> </div> </div> </div> <!-- BAGGAGE INFO --> <div class="card"> <div class="card-header"><div class="card-title">🧳 Baggage Allowance</div><div class="badge badge-green">No Fee</div></div> <div class="budget-row"><div class="budget-label">Carry-on bag</div><div class="budget-amt" style="color:var(--green);">No fee</div></div> <div class="budget-row"><div class="budget-label">1st checked bag (up to 23kg)</div><div class="budget-amt" style="color:var(--green);">No fee</div></div> <div class="budget-row"><div class="budget-label">2nd checked bag (up to 23kg)</div><div class="budget-amt" style="color:var(--green);">No fee</div></div> <div class="tip-block">Always confirm exact weight/size limits directly with the airline before checking in. Japanese domestic airlines have stricter carry-on limits — keep this in mind for the Haneda → Fukuoka leg.</div> </div> <!-- OUTBOUND FLIGHTS --> <h3 style="margin:16px 0 10px;font-size:16px;display:flex;align-items:center;gap:8px;"> ✈ Outbound — Atlanta to Fukuoka <span class="badge badge-blue">May 15–16, 2026</span> </h3> <!-- LEG 1 --> <div class="flight-card"> <div class="flight-header"> <div> <div class="flight-num">UA 7103 · Operated by United</div> <div class="flight-airline">Leg 1 of 3</div> </div> <span id="fs-0" class="flight-status status-unknown">Not yet checked</span> </div> <div class="flight-route"> <div class="flight-airport"> <div class="flight-iata">ATL</div> <div class="flight-city">Atlanta, GA</div> <div class="flight-city" style="font-size:10px;margin-top:1px;">Hartsfield-Jackson · Terminal N</div> <div class="flight-time">5:30 AM</div> <div style="font-size:11px;color:var(--muted);">Fri, May 15</div> </div> <div class="flight-arrow"> <div>✈ ──────</div> <div class="flight-duration">1h 47m</div> </div> <div class="flight-airport"> <div class="flight-iata">IAD</div> <div class="flight-city">Washington Dulles, DC</div> <div class="flight-time">7:17 AM</div> <div style="font-size:11px;color:var(--muted);">Fri, May 15</div> </div> </div> <div class="flight-detail-row"> <span><strong>Class:</strong> Economy / Coach (W)</span> <span><strong>Layover at IAD:</strong> 4h 58m</span> </div> <button class="flight-refresh" onclick="fetchFlight(0)">🔄 Refresh Live Status</button> </div> <!-- LEG 2 --> <div class="flight-card"> <div class="flight-header"> <div> <div class="flight-num">NH 101 · All Nippon Airways</div> <div class="flight-airline">Leg 2 of 3 — Long haul across Pacific</div> </div> <span id="fs-1" class="flight-status status-unknown">Not yet checked</span> </div> <div class="flight-route"> <div class="flight-airport"> <div class="flight-iata">IAD</div> <div class="flight-city">Washington Dulles, DC</div> <div class="flight-time">12:15 PM</div> <div style="font-size:11px;color:var(--muted);">Fri, May 15</div> </div> <div class="flight-arrow"> <div>✈ ──────</div> <div class="flight-duration">14h 5m</div> </div> <div class="flight-airport"> <div class="flight-iata">HND</div> <div class="flight-city">Tokyo Haneda</div> <div class="flight-city" style="font-size:10px;margin-top:1px;">Terminal 3</div> <div class="flight-time">3:20 PM</div> <div style="font-size:11px;color:var(--muted);">Sat, May 16</div> </div> </div> <div class="flight-detail-row"> <span><strong>Class:</strong> Economy / Coach (W)</span> <span><strong>Layover at HND:</strong> 2h 40m</span> </div> <div class="tip-block" style="margin-top:8px;font-size:13px;"> Immigration clearance at Haneda. Full guidance shared with Owen directly. </div> <button class="flight-refresh" onclick="fetchFlight(1)">🔄 Refresh Live Status</button> </div> <!-- LEG 3 --> <div class="flight-card"> <div class="flight-header"> <div> <div class="flight-num">NH 267 · All Nippon Airways</div> <div class="flight-airline">Leg 3 of 3 — Final leg to Fukuoka</div> </div> <span id="fs-2" class="flight-status status-unknown">Not yet checked</span> </div> <div class="flight-route"> <div class="flight-airport"> <div class="flight-iata">HND</div> <div class="flight-city">Tokyo Haneda</div> <div class="flight-city" style="font-size:10px;margin-top:1px;">Terminal 2</div> <div class="flight-time">6:00 PM</div> <div style="font-size:11px;color:var(--muted);">Sat, May 16</div> </div> <div class="flight-arrow"> <div>✈ ──────</div> <div class="flight-duration">1h 55m</div> </div> <div class="flight-airport"> <div class="flight-iata">FUK</div> <div class="flight-city">Fukuoka</div> <div class="flight-city" style="font-size:10px;margin-top:1px;">Terminal D</div> <div class="flight-time">7:55 PM</div> <div style="font-size:11px;color:var(--muted);">Sat, May 16</div> </div> </div> <div class="flight-detail-row"> <span><strong>Class:</strong> Economy / Coach (W)</span> </div> <div class="good-block" style="margin-top:8px;font-size:13px;"> Program rendezvous at <strong>Fukuoka Airport domestic terminal at 7:00 PM on May 17</strong>. Owen has a full free day on May 17 to explore Fukuoka. </div> <button class="flight-refresh" onclick="fetchFlight(2)">🔄 Refresh Live Status</button> </div> <div style="background:var(--border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--muted);margin:4px 0 20px;text-align:center;"> <strong>Total outbound duration:</strong> 1 day, 1 hour, 25 minutes &nbsp;·&nbsp; Atlanta → Fukuoka </div> <!-- RETURN FLIGHTS --> <h3 style="margin:8px 0 10px;font-size:16px;display:flex;align-items:center;gap:8px;"> ✈ Return — Fukuoka to Atlanta <span class="badge badge-red">July 26, 2026</span> </h3> <!-- LEG 4 --> <div class="flight-card"> <div class="flight-header"> <div> <div class="flight-num">NH 248 · All Nippon Airways</div> <div class="flight-airline">Leg 1 of 3 — Return</div> </div> <span id="fs-3" class="flight-status status-unknown">Not yet checked</span> </div> <div class="flight-route"> <div class="flight-airport"> <div class="flight-iata">FUK</div> <div class="flight-city">Fukuoka</div> <div class="flight-city" style="font-size:10px;margin-top:1px;">Terminal D</div> <div class="flight-time">10:45 AM</div> <div style="font-size:11px;color:var(--muted);">Sun, Jul 26</div> </div> <div class="flight-arrow"> <div>✈ ──────</div> <div class="flight-duration">1h 50m</div> </div> <div class="flight-airport"> <div class="flight-iata">HND</div> <div class="flight-city">Tokyo Haneda</div> <div class="flight-city" style="font-size:10px;margin-top:1px;">Terminal 2</div> <div class="flight-time">12:35 PM</div> <div style="font-size:11px;color:var(--muted);">Sun, Jul 26</div> </div> </div> <div class="flight-detail-row"> <span><strong>Class:</strong> Economy / Coach (Q)</span> <span><strong>Layover at HND:</strong> 3h 10m</span> </div> <div class="tip-block" style="margin-top:8px;font-size:13px;"> Must be at Fukuoka Airport by 8:45 AM. Book Tokyo → Fukuoka domestic flight for Jul 25 evening. </div> <button class="flight-refresh" onclick="fetchFlight(3)">🔄 Refresh Live Status</button> </div> <!-- LEG 5 --> <div class="flight-card"> <div class="flight-header"> <div> <div class="flight-num">UA 804 · United Airlines</div> <div class="flight-airline">Leg 2 of 3 — Long haul across Pacific</div> </div> <span id="fs-4" class="flight-status status-unknown">Not yet checked</span> </div> <div class="flight-route"> <div class="flight-airport"> <div class="flight-iata">HND</div> <div class="flight-city">Tokyo Haneda</div> <div class="flight-city" style="font-size:10px;margin-top:1px;">Terminal 3</div> <div class="flight-time">3:45 PM</div> <div style="font-size:11px;color:var(--muted);">Sun, Jul 26</div> </div> <div class="flight-arrow"> <div>✈ ──────</div> <div class="flight-duration">13h 5m</div> </div> <div class="flight-airport"> <div class="flight-iata">IAD</div> <div class="flight-city">Washington Dulles, DC</div> <div class="flight-time">3:50 PM</div> <div style="font-size:11px;color:var(--muted);">Sun, Jul 26</div> </div> </div> <div class="flight-detail-row"> <span><strong>Class:</strong> Economy / Coach (Q)</span> <span><strong>Layover at IAD:</strong> 1h 27m</span> </div> <button class="flight-refresh" onclick="fetchFlight(4)">🔄 Refresh Live Status</button> </div> <!-- LEG 6 --> <div class="flight-card"> <div class="flight-header"> <div> <div class="flight-num">UA 2081 · United Airlines</div> <div class="flight-airline">Leg 3 of 3 — Home!</div> </div> <span id="fs-5" class="flight-status status-unknown">Not yet checked</span> </div> <div class="flight-route"> <div class="flight-airport"> <div class="flight-iata">IAD</div> <div class="flight-city">Washington Dulles, DC</div> <div class="flight-time">5:17 PM</div> <div style="font-size:11px;color:var(--muted);">Sun, Jul 26</div> </div> <div class="flight-arrow"> <div>✈ ──────</div> <div class="flight-duration">1h 59m</div> </div> <div class="flight-airport"> <div class="flight-iata">ATL</div> <div class="flight-city">Atlanta, GA</div> <div class="flight-city" style="font-size:10px;margin-top:1px;">Hartsfield-Jackson · Terminal N</div> <div class="flight-time">7:16 PM</div> <div style="font-size:11px;color:var(--muted);">Sun, Jul 26</div> </div> </div> <div class="flight-detail-row"> <span><strong>Class:</strong> Economy / Coach (Q)</span> </div> <div class="good-block" style="margin-top:8px;font-size:13px;"> 🏠 <strong>Owen arrives home 7:16 PM on July 26.</strong> </div> <button class="flight-refresh" onclick="fetchFlight(5)">🔄 Refresh Live Status</button> </div> <div style="background:var(--border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--muted);margin:4px 0 20px;text-align:center;"> <strong>Total return duration:</strong> 21 hours, 31 minutes &nbsp;·&nbsp; Fukuoka → Atlanta </div> <!-- BOOKING POLICIES -->
- <!-- EXPEDIA SUPPORT --> <div class="card"> <div class="card-header"><div class="card-title">📞 Support Contacts</div></div> <div class="budget-row"><div class="budget-label">Expedia Support (changes, issues)</div><div class="budget-amt"><a href="tel:+18777873117" style="color:var(--blue);font-weight:700;">+1-877-787-3117</a></div></div> <div class="budget-row"><div class="budget-label">Booked under email</div><div class="budget-amt">()</div></div> <div class="tip-block">Only the person who booked can change or cancel. Have the Expedia itinerary number and confirmation code ready when calling.</div> </div>
-
-</div>
-
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- CHECKLIST / PREP TAB -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section" id="checklist"> <h2>Pre-Departure Checklist <span class="kanji">出発前</span></h2> <div class="card"> <div class="card-header"><div class="card-title">✅ Already Completed</div><div class="badge badge-green">Done</div></div> <ul class="checklist"> <li class="predone"><div class="cb-wrap"><div class="cb-box"></div></div><div class="cb-text">Flights booked — ATL to Fukuoka (May 15) and return (Jul 26)</div></li> <li class="predone"><div class="cb-wrap"><div class="cb-box"></div></div><div class="cb-text">Passport valid through at least October 2026</div></li> <li class="predone"><div class="cb-wrap"><div class="cb-box"></div></div><div class="cb-text">Payment cards confirmed — details in </div></li> <li class="predone"><div class="cb-wrap"><div class="cb-box"></div></div><div class="cb-text">American Express available as backup</div></li> </ul> </div> <div class="card"> <div class="card-header"><div class="card-title">🔥 Do Right Now</div><div class="badge badge-red">Urgent</div></div> <ul class="checklist"> <li data-id="call-cap1"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('call-cap1')"></div></div><div class="cb-text">Call card issuer — add Japan travel notification for May 15–July 26</div></li> <li data-id="confirm-pin"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('confirm-pin')"></div></div><div class="cb-text">Confirm card PIN is set and working before departure</div></li> <li data-id="buy-esim"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('buy-esim')"></div></div><div class="cb-text">Purchase Japan eSIM through Airalo or Sakura Mobile</div></li> <li data-id="book-hotels"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('book-hotels')"></div></div><div class="cb-text">Book post-program hotels July 19–26 (see Itinerary tab)</div></li> <li data-id="book-domestic-flight"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('book-domestic-flight')"></div></div><div class="cb-text">Book Tokyo → Fukuoka domestic flight for July 25 evening via ANA Experience Japan Fare</div></li> </ul> </div> <div class="card"> <div class="card-header"><div class="card-title">📋 Before May 15</div><div class="badge badge-gold">This Week</div></div> <ul class="checklist"> <li data-id="passport-copies"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('passport-copies')"></div></div><div class="cb-text">Make 2 color photocopies of passport — leave one at home, carry one in bag</div></li> <li data-id="passport-photo"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('passport-photo')"></div></div><div class="cb-text">Photograph passport and save to iCloud / Google Photos</div></li> <li data-id="line-setup"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('line-setup')"></div></div><div class="cb-text">Download and set up LINE app — profile must show full name and clear photo</div></li> <li data-id="visit-japan-web"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('visit-japan-web')"></div></div><div class="cb-text">Register at Visit Japan Web (services.digital.go.jp/en/visit-japan-web)</div></li> <li data-id="cap1-intl-number"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('cap1-intl-number')"></div></div><div class="cb-text">Write Capital One international collect number inside bag</div></li> <li data-id="omiyage"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('omiyage')"></div></div><div class="cb-text">Buy omiyage gift for farm-stay host family — Georgia/hometown item, non-food ($20–30)</div></li> <li data-id="name-check"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('name-check')"></div></div><div class="cb-text">Confirm name on all tickets matches passport exactly</div></li> <li data-id="cash-usd"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('cash-usd')"></div></div><div class="cb-text">Bring cash to exchange on arrival —  for amount</div></li> <li data-id="step-register"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('step-register')"></div></div><div class="cb-text">Register with US Embassy STEP program at step.state.gov</div></li> </ul> </div> <div class="card"> <div class="card-header"><div class="card-title">🎒 Packing Checklist</div></div> <ul class="checklist"> <li data-id="pack-laptop"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-laptop')"></div></div><div class="cb-text">Laptop computer — required for coursework</div></li> <li data-id="pack-powerbank"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-powerbank')"></div></div><div class="cb-text">Large capacity power bank</div></li> <li data-id="pack-business"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-business')"></div></div><div class="cb-text">1–2 business casual outfits — required for company visits</div></li> <li data-id="pack-rain"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-rain')"></div></div><div class="cb-text">Rain jacket AND compact umbrella — rainy season starts early June</div></li> <li data-id="pack-layer"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-layer')"></div></div><div class="cb-text">Light layer for cool foggy mornings on APU's hilltop campus</div></li> <li data-id="pack-meds"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-meds')"></div></div><div class="cb-text">OTC medications: ibuprofen, cold medicine, Pepto, Benadryl — NO Sudafed/pseudoephedrine</div></li> <li data-id="pack-shoes"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-shoes')"></div></div><div class="cb-text">Dedicated gym shoes for APU facility — larger sizes hard to find in Beppu</div></li> </ul> </div> <div class="card">
-    <div class="card-header"><div class="card-title">👕 Clothing Packing List</div><div class="badge badge-blue">Beppu · May–July</div></div>
-    <h3 style="margin-top:4px;">Everyday Campus Wear</h3>
-    <ul class="checklist">
-      <li data-id="pack-tshirts"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-tshirts')"></div></div><div class="cb-text">5–6 t-shirts / lightweight shirts — Beppu is hot and humid June–July</div></li>
-      <li data-id="pack-pants"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-pants')"></div></div><div class="cb-text">2–3 pairs of lightweight pants or chinos — shorts are fine on campus but not for company visits</div></li>
-      <li data-id="pack-shorts"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-shorts')"></div></div><div class="cb-text">2–3 pairs of shorts for dorm and casual weekends</div></li>
-      <li data-id="pack-hoodie"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-hoodie')"></div></div><div class="cb-text">1–2 lightweight long-sleeve layers or zip hoodie — APU hilltop gets cool and foggy even in June</div></li>
-      <li data-id="pack-socks"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-socks')"></div></div><div class="cb-text">7–8 pairs of socks — feet are visible constantly in shoes-off culture</div></li>
-      <li data-id="pack-underwear"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-underwear')"></div></div><div class="cb-text">7 pairs of underwear — laundry machines on every floor at AP House</div></li>
-    </ul>
-    <h3>Business Casual (Company Visits)</h3>
-    <ul class="checklist">
-      <li data-id="pack-dress-shirt"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-dress-shirt')"></div></div><div class="cb-text">2 collared dress shirts or button-downs — mandatory for Japanese company visits</div></li>
-      <li data-id="pack-dress-pants"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-dress-pants')"></div></div><div class="cb-text">1 pair of dress pants or smart chinos — not jeans for company visits</div></li>
-      <li data-id="pack-dress-shoes"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-dress-shoes')"></div></div><div class="cb-text">Smart shoes or clean leather sneakers — slip-on preferred for shoes-off locations</div></li>
-      <li data-id="pack-belt"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-belt')"></div></div><div class="cb-text">Belt to match dress pants</div></li>
-    </ul>
-    <h3>Rain &amp; Rainy Season (June – mid-July)</h3>
-    <ul class="checklist">
-      <li data-id="pack-rain-jacket2"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-rain-jacket2')"></div></div><div class="cb-text">Lightweight packable rain jacket — tsuyu rainy season starts early June, lasts 6–7 weeks. Non-negotiable.</div></li>
-      <li data-id="pack-umbrella"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-umbrella')"></div></div><div class="cb-text">Compact travel umbrella — rain can persist for days at a time during tsuyu</div></li>
-      <li data-id="pack-quick-dry"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-quick-dry')"></div></div><div class="cb-text">2–3 quick-dry shirts — clothes dry slowly in rainy season humidity</div></li>
-    </ul>
-    <h3>Footwear</h3>
-    <ul class="checklist">
-      <li data-id="pack-sneakers"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-sneakers')"></div></div><div class="cb-text">Comfortable walking sneakers — for daily campus use and sightseeing</div></li>
-      <li data-id="pack-slipons"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-slipons')"></div></div><div class="cb-text">Easy slip-on shoes or sandals — dorm, onsen, and shoes-off locations</div></li>
-      <li data-id="pack-gym-shoes2"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-gym-shoes2')"></div></div><div class="cb-text">Dedicated gym-only athletic shoes — APU requires indoor-only shoes. Sizes above US 11 very hard to find in Beppu.</div></li>
-      <li data-id="pack-flip-flops"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-flip-flops')"></div></div><div class="cb-text">Flip flops — communal shower areas and AP House floors</div></li>
-    </ul>
-    <h3>Onsen &amp; Farm Stay</h3>
-    <ul class="checklist">
-      <li data-id="pack-farm-outfit"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-farm-outfit')"></div></div><div class="cb-text">Old clothes you don't mind getting dirty for the farm stay weekend</div></li>
-      <li data-id="pack-swimwear"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-swimwear')"></div></div><div class="cb-text">Swimwear — for any pool use (NOT for traditional onsen — those are swimwear-free)</div></li>
-    </ul>
-    <h3>Solo Travel Week (Jul 19–26)</h3>
-    <ul class="checklist">
-      <li data-id="pack-travel-outfits"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-travel-outfits')"></div></div><div class="cb-text">2–3 clean outfits set aside for travel week — July is 30°C+ and very humid in Tokyo, Kyoto, Hiroshima</div></li>
-      <li data-id="pack-daypack"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('pack-daypack')"></div></div><div class="cb-text">Small daypack or crossbody bag — for day trips, water bottle, umbrella, and snacks</div></li>
-    </ul>
-    <div class="tip-block"><strong>Laundry tip:</strong> AP House has machines on every floor — pack for 5–7 days and do laundry weekly. Bring detergent pods for the first week. Japanese dryers run hot — avoid anything that shrinks easily.</div>
-    <div class="alert-block"><strong>Skip the heavy jeans and bulky sweaters</strong> — Beppu summer is hot and humid. Pack light fabrics you can layer.</div>
-  </div> <div class="card"> <div class="card-header"><div class="card-title">📱 Apps to Install</div></div> <ul class="checklist"> <li data-id="app-line"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('app-line')"></div></div><div class="cb-text">LINE — install and set up profile with full name + photo</div></li> <li data-id="app-gmaps"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('app-gmaps')"></div></div><div class="cb-text">Google Maps — download offline maps for Beppu, Fukuoka, Hiroshima, Kyoto, Tokyo</div></li> <li data-id="app-translate"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('app-translate')"></div></div><div class="cb-text">Google Translate — download Japanese offline language pack</div></li> <li data-id="app-navitime"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('app-navitime')"></div></div><div class="cb-text">Navitime / Japan Transit Planner</div></li> <li data-id="app-cap1"><div class="cb-wrap"><div class="cb-box" onclick="toggleById('app-cap1')"></div></div><div class="cb-text">Banking app — set travel notification and spending alerts</div></li> </ul> </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- MONEY TAB -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section" id="money"> <h2>Money &amp; Currency <span class="kanji">お金</span></h2> <div class="converter"> <div class="conv-tabs"> <button class="conv-tab active" onclick="setConvDir('usd2jpy',this)">USD → YEN</button> <button class="conv-tab" onclick="setConvDir('jpy2usd',this)">YEN → USD</button> </div> <div class="converter-row"> <div> <input class="conv-input" id="convInput" type="number" value="100" oninput="convert()"> <div class="conv-label" id="convFromLabel">US Dollars (USD)</div> </div> <div class="conv-arrow">→</div> <div> <div class="conv-result" id="convResult">—</div> <div class="conv-label" id="convToLabel">Japanese Yen (¥)</div> </div> </div> <div class="conv-rate" id="convRate">Loading live rate…</div> <div class="quick-amounts" id="quickAmounts"></div> </div>
-
-<div class="card">
-    <div class="card-header"><div class="card-title">💳 Money Tips</div></div>
-    <div class="alert-block"><strong>Always pay in YEN — never USD.</strong> When a terminal asks "Pay in USD or JPY?" — always choose JPY. Every single time. Paying in USD adds a hidden 3–6% markup called dynamic currency conversion.</div>
-    <ul class="checklist">
-      <li class="static">Visa and Mastercard are accepted almost everywhere that takes cards</li>
-      <li class="static">American Express works at hotels, department stores, and larger restaurants only</li>
-      <li class="static">Many small restaurants, shrines, temples, and rural shops are cash only</li>
-      <li class="static">7-Eleven (7-Bank) and Lawson ATMs reliably accept US cards — English menus available</li>
-      <li class="static">Coins are high-value — ¥500 ≈ $3.25, ¥100 ≈ $0.65. Use them constantly.</li>
-      <li class="static">Coins cannot be exchanged back to USD at banks — spend them before flying home</li>
-      <li class="static">Show your passport at larger stores for 8–10% tax refund on purchases over ¥5,000</li>
-      <li class="static">Banks in Japan close at 3:00pm and are closed on weekends</li>
-    </ul>
-  </div>
-
- <div class="card" style="margin-top:14px;"> <div class="card-header"><div class="card-title">🍜 Daily Food Budget — Beppu</div></div> <div class="budget-row"><div class="budget-label">Breakfast — convenience store / campus</div><div class="budget-amt">¥300–600 (~$2–4)</div></div> <div class="budget-row"><div class="budget-label">Lunch — teishoku set / ramen</div><div class="budget-amt">¥700–1,100 (~$5–7)</div></div> <div class="budget-row"><div class="budget-label">Dinner — local restaurant</div><div class="budget-amt">¥900–1,800 (~$6–12)</div></div> <div class="budget-row"><div class="budget-label">Drinks, snacks, vending machines</div><div class="budget-amt">¥300–500 (~$2–3)</div></div> <div class="budget-total"><span>Daily total (moderate)</span><span style="color:var(--red)">~$15–27</span></div> </div> <div class="card"> <div class="card-header"><div class="card-title">💵 Budget & Card Details</div></div> <div class="tip-block">Budget details and card strategy shared directly with the family.</div> </div>
-</div>
-
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- ITINERARY TAB -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section" id="itinerary"> <h2>Trip Itinerary <span class="kanji">旅程</span></h2> <div class="tip-block">Anyone can add hotels, bookings, and activities. All entries show who added them and sync to the calendar automatically.</div> <div class="itinerary-form"> <h3 style="margin-top:0;">+ Add Entry</h3> <div class="form-row"> <div class="form-group"> <label class="form-label">Your Name</label> <input class="form-input" id="itinName" placeholder="e.g. Owen, Dad, Mom" type="text"> </div> <div class="form-group"> <label class="form-label">Type</label> <select class="form-select" id="itinType"> <option value="hotel">🏨 Hotel</option> <option value="flight">✈ Flight / Transport</option> <option value="activity">🎌 Activity / Sightseeing</option> <option value="transport">🚄 Train / Bus</option> <option value="other">📝 Other</option> </select> </div> </div> <div class="form-row"> <div class="form-group"> <label class="form-label">Title</label> <input class="form-input" id="itinTitle" placeholder="e.g. Dormy Inn Hiroshima" type="text"> </div> <div class="form-group"> <label class="form-label">Location</label> <input class="form-input" id="itinLocation" placeholder="e.g. Hiroshima" type="text"> </div> </div> <div class="form-row"> <div class="form-group"> <label class="form-label">Start Date</label> <input class="form-input" id="itinStart" type="date"> </div> <div class="form-group"> <label class="form-label">End Date (optional)</label> <input class="form-input" id="itinEnd" type="date"> </div> </div> <div class="form-group" style="margin-bottom:12px;"> <label class="form-label">Notes / Confirmation # (optional)</label> <textarea class="form-textarea" id="itinNotes" placeholder="Booking reference, address, check-in time…"></textarea> </div> <button class="btn-primary" onclick="addItinEntry()">Add to Itinerary</button> </div> <div id="itinList"><div style="text-align:center;color:var(--muted);padding:20px;font-size:14px;">No entries yet — add your first booking above</div></div>
-</div>
-  </div><!-- end itinContent -->
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- CALENDAR TAB -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section" id="calendar"> <h2>Calendar <span class="kanji">カレンダー</span></h2> <div class="card"> <div class="cal-header"> <button class="cal-nav" onclick="calNav(-1)">← Prev</button> <div class="cal-title" id="calTitle"></div> <button class="cal-nav" onclick="calNav(1)">Next →</button> </div> <div class="cal-grid" id="calGrid"></div> </div> <div class="tip-block">Program dates are pre-loaded in purple. Your itinerary bookings appear automatically as you add them.</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- MAP & JOURNAL TAB -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section" id="map">
-  <h2>Map &amp; Travel Journal <span class="kanji">日記</span></h2>
-
-  <div class="inner-tabs">
-    <button class="inner-tab active" onclick="showInner('mapView',this)">🗾 Map</button>
-    <button class="inner-tab" onclick="showInner('journalView',this)">📓 Journal</button>
-  </div>
-
-  <!-- MAP VIEW -->
-  <div id="mapView">
-    <div class="card" style="padding:0;overflow:hidden;border-radius:12px;">
-      <div id="googleMap" style="width:100%;height:480px;"></div>
-    </div>
-    <div class="tip-block" style="margin-top:10px;">Tap any pin to see details. Click <strong>Mark Visited</strong> on a location to light it up — syncs to the whole family in real time.</div>
-    <div id="visitedList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
-  </div>
-
-  <!-- JOURNAL VIEW -->
-  <div id="journalView" style="display:none;">
-    <div id="journalList"><div style="text-align:center;color:var(--muted);padding:20px;font-size:14px;">No entries yet — Owen can start writing when he arrives!</div></div>
-  </div>
-</div>
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- EMERGENCY TAB -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section" id="emergency"> <h2>Emergency Contacts <span class="kanji">緊急</span></h2> <div class="alert-block">Keep this tab bookmarked. These numbers are critical if something goes wrong.</div> <div class="emerg-card"> <h3>🆘 Japan Emergency Numbers</h3> <div class="emerg-row"><div class="emerg-label">Police (警察)</div><div class="emerg-val"><a href="tel:110">110</a></div></div> <div class="emerg-row"><div class="emerg-label">Ambulance &amp; Fire (救急・消防)</div><div class="emerg-val"><a href="tel:119">119</a></div></div> <div class="emerg-row"><div class="emerg-label">Japan Emergency Helpline (English)</div><div class="emerg-val"><a href="tel:+81570-783-556">+81 570-783-556</a></div></div> </div> <div class="card"> <div class="card-header"><div class="card-title">🏥 Medical Insurance — Gallagher</div><div class="badge badge-red">Save This</div></div> <div class="budget-row"><div class="budget-label">Insurance Provider</div><div class="budget-amt">Gallagher</div></div> <div class="budget-row"><div class="budget-label">Coverage</div><div class="budget-amt">May 17 – Jul 19, 2026</div></div> <div class="budget-row"><div class="budget-label">Policy info arrives via</div><div class="budget-amt">Email before departure</div></div> <div class="alert-block">For hospitalization or surgery: <strong>Contact Gallagher FIRST</strong> before paying. They will arrange payment directly with the hospital. For minor clinic visits: pay upfront and file a reimbursement claim.</div> </div> <div class="card"> <div class="card-header"><div class="card-title">📞 Key Contacts</div></div> <div class="budget-row"><div class="budget-label">Program Director — Aki Matsushima</div><div class="budget-amt">Via LINE</div></div> <div class="budget-row"><div class="budget-label">Program Director — Masato Kikuchi</div><div class="budget-amt">Via LINE</div></div> <div class="budget-row"><div class="budget-label">APU Academic Office</div><div class="budget-amt">+81 977-78-1101</div></div> <div class="budget-row"><div class="budget-label">US Embassy Tokyo</div><div class="budget-amt">+81 3-3224-5000</div></div> <div class="budget-row"><div class="budget-label">Card issuer (international)</div><div class="budget-amt">Back of card</div></div>  </div>
-
-  <div class="card"> <div class="card-header"><div class="card-title">🛂 Immigration Info — Critical</div></div> <div class="good-block"><strong>At immigration always say:</strong> "I am here for sightseeing and cultural study" or "Tourism." Full guidance shared with Owen directly.</div> <div class="budget-row"><div class="budget-label">Visa type</div><div class="budget-amt">Visa waiver (90 days)</div></div> <div class="budget-row"><div class="budget-label">Days in Japan</div><div class="budget-amt">71 days (May 16 – Jul 26)</div></div> <div class="budget-row"><div class="budget-label">Return ticket</div><div class="budget-amt">Fukuoka → Atlanta, Jul 26</div></div> </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- INFO TAB (combined arrival, tips, apps, phrases) -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section" id="info"> <h2>Travel Info <span class="kanji">情報</span></h2> <div class="inner-tabs"> <button class="inner-tab active" onclick="showInner('infoArrival',this)">✈ Arrival</button> <button class="inner-tab" onclick="showInner('infoSolo',this)">🚃 Transport</button> <button class="inner-tab" onclick="showInner('infoTips',this)">📋 Tips</button> <button class="inner-tab" onclick="showInner('infoApps',this)">📱 Apps</button> <button class="inner-tab" onclick="showInner('infoPhrases',this)">🗣 Phrases</button> </div> <div id="infoArrival"> <div class="card"> <div class="card-header"><div class="card-title">🛂 Immigration</div></div> <div class="tip-block">Full immigration guidance shared directly with Owen.</div> </div> <div class="card"> <div class="card-header"><div class="card-title">🗾 May 17 Rendezvous</div></div> <p>Owen lands Fukuoka <strong>May 16 at 7:55pm</strong>. Program meets at <strong>7:00pm May 17</strong> at Fukuoka Airport domestic terminal. He has a free day to explore Fukuoka.</p> <div class="tip-block">Arrive at domestic terminal by 6:30pm. Bus to Beppu departs promptly — do NOT be late.</div> </div> </div> <div id="infoSolo" style="display:none;"> <div class="alert-block"><strong>Return flight departs Fukuoka July 26 at 10:45am.</strong> Owen needs a Tokyo → Fukuoka domestic flight the evening of July 25 via ANA Experience Japan Fare (ana.co.jp).</div> <div class="card"> <div class="card-header"><div class="card-title">🗺 Suggested Route (Traveling Backwards)</div></div> <div class="timeline"> <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 19</div><div class="tl-body">Program ends → Shinkansen to <strong>Hiroshima</strong> (~2 hrs via Hakata)</div></div> <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 20</div><div class="tl-body"><strong>Peace Memorial Museum</strong> + day trip to <strong>Miyajima Island</strong> (floating torii)</div></div> <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 21–22</div><div class="tl-body"><strong>Kyoto</strong> — Fushimi Inari, Arashiyama, day trip to Osaka</div></div> <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 23–24</div><div class="tl-body"><strong>Tokyo</strong> — Shibuya, Shinjuku, Akihabara, Senso-ji</div></div> <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 25</div><div class="tl-body">Morning in Tokyo → <strong>ANA flight to Fukuoka</strong> evening. Stay near airport.</div></div> <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 26</div><div class="tl-body">Departs Fukuoka 10:45am → Atlanta 7:16pm</div></div> </div> </div> <div class="card"> <div class="card-header"><div class="card-title">🚄 Skip the JR Pass — Save ~$117</div></div> <table><thead><tr><th>Route</th><th>Individual Fare</th></tr></thead> <tbody> <tr><td>Hakata → Hiroshima</td><td>Book at smart-ex.jp</td></tr> <tr><td>Hiroshima → Kyoto</td><td>Book at smart-ex.jp</td></tr> <tr><td>Kyoto → Tokyo</td><td>Book at smart-ex.jp</td></tr> <tr><td><strong>Total</strong></td><td><strong>Individual tickets are cheaper — buy at smart-ex.jp</strong></td></tr> </tbody></table> <div class="tip-block">Buy tickets at smart-ex.jp or any JR ticket machine in Japan.</div> </div> </div> <div id="infoTips" style="display:none;"> <div class="card"> <div class="card-header"><div class="card-title">💊 Medication Rules</div><div class="badge badge-red">Strict</div></div> <div class="two-col"> <div style="background:var(--red-light);border:1px solid #f0c0bb;border-radius:8px;padding:14px;"> <div style="font-weight:600;font-size:13px;color:var(--red);margin-bottom:6px;">❌ Do NOT Bring</div> <div style="font-size:13px;line-height:1.9;color:var(--muted);">Sudafed · Actifed · Dayquil<br>Vicks inhalers · NyQuil<br>Pseudoephedrine · Codeine</div> </div> <div style="background:var(--green-light);border:1px solid #c3e8d0;border-radius:8px;padding:14px;"> <div style="font-weight:600;font-size:13px;color:var(--green);margin-bottom:6px;">✓ Safe to Bring</div> <div style="font-size:13px;line-height:1.9;color:var(--muted);">Tylenol · Advil / ibuprofen<br>Mucinex (guaifenesin only)<br>Pepto-Bismol · Benadryl</div> </div> </div> </div> <div class="card"> <div class="card-header"><div class="card-title">📋 Cultural Essentials</div></div> <ul class="checklist"> <li class="static"><strong>No tipping — ever.</strong> Restaurants, taxis, hotels.</li> <li class="static"><strong>Shoes off</strong> in dorm rooms, tatami areas, many restaurants.</li> <li class="static"><strong>Trains are silent.</strong> No calls. Manner mode (マナーモード).</li> <li class="static"><strong>Cars drive on the LEFT.</strong> Look right before stepping off curbs.</li> <li class="static"><strong>Coins are high-value.</strong> ¥500 = ~$3.25. Use them constantly.</li> <li class="static"><strong>Tax-free shopping.</strong> Show passport for 8–10% refund over ¥5,000.</li> <li class="static"><strong>Onsen:</strong> Shower first. No swimwear. No towels in the water.</li> <li class="static"><strong>Trash cans are rare</strong> — carry a small bag for wrappers.</li> </ul> </div> </div> <div id="infoApps" style="display:none;"> <div class="card"> <div class="app-row"><div class="app-icon">💬</div><div><div class="app-name">LINE</div><div class="app-desc">Required — program communicates exclusively via LINE. Set up profile with full name + photo.</div></div></div> <div class="app-row"><div class="app-icon">🗺</div><div><div class="app-name">Google Maps</div><div class="app-desc">Download offline maps for Beppu, Fukuoka, Hiroshima, Kyoto, Tokyo before leaving.</div></div></div> <div class="app-row"><div class="app-icon">🚄</div><div><div class="app-name">Navitime / Japan Transit Planner</div><div class="app-desc">Best for Japan's train system — tells you exactly which car to board.</div></div></div> <div class="app-row"><div class="app-icon">🔤</div><div><div class="app-name">Google Translate</div><div class="app-desc">Download Japanese offline pack. Camera mode translates menus and signs in real time.</div></div></div> <div class="app-row"><div class="app-icon">🗾</div><div><div class="app-name">Visit Japan Web</div><div class="app-desc">Pre-fill entry and customs forms before departure for faster immigration at Haneda.</div></div></div> <div class="app-row"><div class="app-icon">💳</div><div><div class="app-name">Banking App</div><div class="app-desc">Set travel notification, confirm PIN, enable spending alerts.</div></div></div> </div> </div> <div id="infoPhrases" style="display:none;"> <div class="card"> <div class="phrase-row"><div class="phrase-jp">観光です<span class="phrase-reading">Kankō desu</span></div><div><div>I am here for tourism</div><div class="phrase-en-sub">Use at immigration — most important phrase</div></div></div> <div class="phrase-row"><div class="phrase-jp">すみません<span class="phrase-reading">Sumimasen</span></div><div><div>Excuse me / Sorry</div><div class="phrase-en-sub">Most useful word in Japan</div></div></div> <div class="phrase-row"><div class="phrase-jp">これください<span class="phrase-reading">Kore kudasai</span></div><div><div>I'll have this, please</div><div class="phrase-en-sub">Point at menu item — works everywhere</div></div></div> <div class="phrase-row"><div class="phrase-jp">いくらですか<span class="phrase-reading">Ikura desu ka</span></div><div><div>How much is this?</div><div class="phrase-en-sub">Essential for markets and small shops</div></div></div> <div class="phrase-row"><div class="phrase-jp">カードで払えますか<span class="phrase-reading">Kādo de haraemasu ka</span></div><div><div>Can I pay by card?</div><div class="phrase-en-sub">Always ask before assuming</div></div></div> <div class="phrase-row"><div class="phrase-jp">ありがとうございます<span class="phrase-reading">Arigatō gozaimasu</span></div><div><div>Thank you very much</div><div class="phrase-en-sub">Formal — shopkeepers, staff, host family</div></div></div> <div class="phrase-row"><div class="phrase-jp">トイレはどこですか<span class="phrase-reading">Toire wa doko desu ka</span></div><div><div>Where is the bathroom?</div><div class="phrase-en-sub">You will need this</div></div></div> <div class="phrase-row"><div class="phrase-jp">助けてください<span class="phrase-reading">Tasukete kudasai</span></div><div><div>Please help me</div><div class="phrase-en-sub">Emergency phrase</div></div></div> </div> </div>
-</div>
-
-<div class="footer">Owen Carroll · Georgia Tech LBAT Japan 2026 · Safe travels! 🇯🇵</div>
-</div>
-
 </body>
 </html>
