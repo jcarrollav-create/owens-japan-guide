@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Owen Check-In">
+<title>Owen Check-In</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --green: #1a6b3a; --green-light: #f0faf4;
+    --red: #c0392b; --red-light: #fdf0ef;
+    --ink: #1a1a2e; --muted: #5a5a72;
+    --border: #e0dff0; --bg: #f8f9fa;
+    --gold: #b8860b;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    font-family: -apple-system, 'DM Sans', sans-serif;
+    color: var(--ink);
+    overscroll-behavior: none;
+  }
+
+  .screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    text-align: center;
+  }
+
+  /* IDLE STATE */
+  .idle-screen { background: linear-gradient(160deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); }
+
+  .japan-text {
+    font-size: 72px;
+    opacity: 0.12;
+    position: absolute;
+    top: 24px;
+    right: 20px;
+    line-height: 1;
+    pointer-events: none;
+    font-family: 'Noto Serif JP', serif;
+  }
+
+  .greeting {
+    font-size: 15px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .main-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .sub-title {
+    font-size: 15px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 48px;
+    line-height: 1.5;
+  }
+
+  .mood-prompt {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 16px;
+    letter-spacing: .04em;
+  }
+
+  .mood-btns {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+
+  .mood-btn {
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 18px 28px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    transition: all .2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 130px;
+    -webkit-user-select: none;
+  }
+
+  .mood-btn .mood-emoji { font-size: 36px; }
+  .mood-btn .mood-label { font-size: 13px; font-weight: 600; letter-spacing: .04em; }
+
+  .mood-btn.good:hover, .mood-btn.good:active {
+    background: rgba(26,107,58,0.4);
+    border-color: #4caf76;
+    transform: scale(1.04);
+  }
+
+  .mood-btn.help {
+    border-color: rgba(192,57,43,0.4);
+  }
+  .mood-btn.help:hover, .mood-btn.help:active {
+    background: rgba(192,57,43,0.35);
+    border-color: #e05a4a;
+    transform: scale(1.04);
+  }
+
+  .selected-good { background: rgba(26,107,58,0.4) !important; border-color: #4caf76 !important; }
+  .selected-help { background: rgba(192,57,43,0.35) !important; border-color: #e05a4a !important; }
+
+  .optional-msg {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 15px;
+    color: #fff;
+    width: 100%;
+    max-width: 320px;
+    font-family: -apple-system, sans-serif;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .optional-msg::placeholder { color: rgba(255,255,255,0.35); }
+  .optional-msg:focus { outline: none; border-color: rgba(255,255,255,0.4); }
+
+  .send-btn {
+    background: var(--green);
+    border: none;
+    border-radius: 16px;
+    padding: 18px 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    width: 100%;
+    max-width: 320px;
+    transition: all .2s;
+    letter-spacing: .02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .send-btn:active { transform: scale(.97); background: #155c30; }
+  .send-btn:disabled { background: rgba(255,255,255,0.15); cursor: not-allowed; transform: none; }
+
+  .send-btn.help-mode { background: var(--red); }
+  .send-btn.help-mode:active { background: #a93226; }
+
+  .status-text {
+    margin-top: 16px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    min-height: 20px;
+  }
+
+  .location-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 16px;
+    justify-content: center;
+  }
+  .loc-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.3); flex-shrink: 0; }
+  .loc-dot.active { background: #4caf76; animation: pulse .8s infinite; }
+  .loc-dot.error { background: #e05a4a; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+
+  /* SUCCESS STATE */
+  .success-screen { background: linear-gradient(160deg, #0d3320 0%, #1a6b3a 100%); }
+  .success-icon { font-size: 80px; margin-bottom: 16px; }
+  .success-title { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+  .success-sub { font-size: 15px; color: rgba(255,255,255,0.65); line-height: 1.6; margin-bottom: 32px; }
+  .success-detail { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 16px 20px; width: 100%; max-width: 320px; text-align: left; margin-bottom: 24px; }
+  .success-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 13px; }
+  .success-row:last-child { border-bottom: none; }
+  .success-row-label { color: rgba(255,255,255,0.55); }
+  .success-row-val { color: #fff; font-weight: 600; text-align: right; max-width: 180px; }
+  .reset-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 12px 28px; font-size: 15px; color: rgba(255,255,255,0.8); cursor: pointer; font-family: -apple-system, sans-serif; }
+
+  /* HELP STATE */
+  .help-screen { background: linear-gradient(160deg, #3d0c08 0%, #c0392b 100%); }
+  .help-title { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+  .help-sub { font-size: 15px; color: rgba(255,255,255,0.75); line-height: 1.6; margin-bottom: 28px; }
+  .help-contacts { background: rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 20px; width: 100%; max-width: 320px; text-align: left; margin-bottom: 20px; }
+  .help-contact-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.15); font-size:14px; }
+  .help-contact-row:last-child { border-bottom: none; }
+  .help-contact-label { color: rgba(255,255,255,0.65); }
+  .help-contact-val { color: #fff; font-weight: 700; }
+  .help-contact-val a { color: #fff; text-decoration: none; }
+  .call-btn { background: #fff; color: var(--red); border: none; border-radius: 12px; padding: 14px 0; font-size: 16px; font-weight: 700; cursor: pointer; width: 100%; max-width: 320px; margin-bottom: 10px; font-family: -apple-system, sans-serif; }
+  .call-btn:active { transform: scale(.97); }
+
+  /* LOADING OVERLAY */
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    display: none;
+  }
+  .loading-spinner {
+    width: 50px; height: 50px;
+    border: 4px solid rgba(255,255,255,0.2);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .screen { display: none; }
+  .screen.active { display: flex; }
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- MAIN CHECK-IN SCREEN -->
+<div class="screen idle-screen active" id="screenMain">
+  <div class="japan-text">安全</div>
+
+  <div class="greeting">Hey Owen 👋</div>
+  <div class="main-title">Family Check-In</div>
+  <div class="sub-title">Let everyone know you're safe.<br>Takes 3 seconds.</div>
+
+  <div class="mood-prompt">HOW ARE YOU DOING?</div>
+  <div class="mood-btns">
+    <button class="mood-btn good" id="btnGood" onclick="selectMood('good')">
+      <span class="mood-emoji">👍</span>
+      <span class="mood-label">ALL GOOD</span>
+    </button>
+    <button class="mood-btn help" id="btnHelp" onclick="selectMood('help')">
+      <span class="mood-emoji">🆘</span>
+      <span class="mood-label">NEED HELP</span>
+    </button>
+  </div>
+
+  <input class="optional-msg" id="msgInput" type="text" placeholder="Optional message (where are you? what's up?)">
+
+  <div class="location-status">
+    <div class="loc-dot" id="locDot"></div>
+    <span id="locLabel">Getting your location…</span>
+  </div>
+
+  <button class="send-btn" id="sendBtn" onclick="sendCheckin()" disabled>
+    <span id="sendIcon">📍</span>
+    <span id="sendLabel">Select a mood first</span>
+  </button>
+
+  <div class="status-text" id="statusText"></div>
+</div>
+
+<!-- SUCCESS SCREEN -->
+<div class="screen success-screen" id="screenSuccess">
+  <div class="success-icon">✅</div>
+  <div class="success-title">Check-In Sent!</div>
+  <div class="success-sub">Your family knows you're safe.<br>Email sent to Mom & Dad.</div>
+  <div class="success-detail" id="successDetail"></div>
+  <button class="reset-btn" onclick="resetForm()">← Check in again</button>
+</div>
+
+<!-- NEED HELP SCREEN -->
+<div class="screen help-screen" id="screenHelp">
+  <div style="font-size:60px;margin-bottom:16px;">🆘</div>
+  <div class="help-title">Alert Sent to Family</div>
+  <div class="help-sub">Your family has been notified.<br>Here are your emergency contacts:</div>
+  <div class="help-contacts">
+    <div class="help-contact-row"><div class="help-contact-label">Home (Georgia)</div><div class="help-contact-val"><a href="tel:17703092860">770-309-2860</a></div></div>
+    <div class="help-contact-row"><div class="help-contact-label">Japan Police</div><div class="help-contact-val"><a href="tel:110">110</a></div></div>
+    <div class="help-contact-row"><div class="help-contact-label">Japan Ambulance</div><div class="help-contact-val"><a href="tel:119">119</a></div></div>
+    <div class="help-contact-row"><div class="help-contact-label">US Embassy Tokyo</div><div class="help-contact-val"><a href="tel:+81332245000">+81 3-3224-5000</a></div></div>
+    <div class="help-contact-row"><div class="help-contact-label">APU Office</div><div class="help-contact-val"><a href="tel:+819778781101">+81 977-78-1101</a></div></div>
+  </div>
+  <a href="tel:17703092860"><button class="call-btn">📞 Call Home Now</button></a>
+  <button class="reset-btn" style="color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);margin-top:10px;" onclick="resetForm()">← Back</button>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://fmlolwkndaqpxvfszswx.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtbG9sd2tuZGFxcHh2ZnN6c3d4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDMzMTksImV4cCI6MjA5MzQ3OTMxOX0.mDg9MlJ83KP2lzsi_7jvPN1tLmRvupBtZcS0Sj8ITXo';
+const EMAILJS_PUBLIC = 'fwdsejjjDWOwVLi_5';
+const EMAILJS_SERVICE = 'service_dd004t9';
+const EMAILJS_TEMPLATE = 'template_461s73b';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+emailjs.init(EMAILJS_PUBLIC);
+
+let selectedMood = null;
+let coords = null;
+let address = 'Getting location…';
+
+// ── GET LOCATION ON LOAD ──────────────────────────────────
+function initLocation() {
+  const dot = document.getElementById('locDot');
+  const lbl = document.getElementById('locLabel');
+  if (!navigator.geolocation) {
+    lbl.textContent = 'Location unavailable on this device';
+    dot.classList.add('error');
+    address = 'Location not available';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      dot.classList.add('active');
+      lbl.textContent = 'Location found ✓';
+      address = await reverseGeocode(coords.lat, coords.lng);
+      lbl.textContent = address.length > 40 ? address.substring(0,40)+'…' : address;
+    },
+    (err) => {
+      dot.classList.add('error');
+      lbl.textContent = 'Location denied — will send without it';
+      address = 'Location not shared';
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+async function reverseGeocode(lat, lng) {
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+    const data = await res.json();
+    if (data && data.display_name) {
+      // Clean up — show city/town level
+      const parts = data.display_name.split(',');
+      return parts.slice(0, 3).join(',').trim();
+    }
+    return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  } catch(e) {
+    return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  }
+}
+
+// ── MOOD SELECTION ────────────────────────────────────────
+function selectMood(mood) {
+  selectedMood = mood;
+  const btnGood = document.getElementById('btnGood');
+  const btnHelp = document.getElementById('btnHelp');
+  const sendBtn = document.getElementById('sendBtn');
+  const sendLabel = document.getElementById('sendLabel');
+
+  btnGood.classList.remove('selected-good');
+  btnHelp.classList.remove('selected-help');
+
+  if (mood === 'good') {
+    btnGood.classList.add('selected-good');
+    sendBtn.className = 'send-btn';
+    sendLabel.textContent = 'Send Check-In 👍';
+  } else {
+    btnHelp.classList.add('selected-help');
+    sendBtn.className = 'send-btn help-mode';
+    sendLabel.textContent = 'Send Alert 🆘';
+  }
+  sendBtn.disabled = false;
+}
+
+// ── SEND CHECK-IN ─────────────────────────────────────────
+async function sendCheckin() {
+  if (!selectedMood) return;
+
+  const sendBtn = document.getElementById('sendBtn');
+  const overlay = document.getElementById('loadingOverlay');
+  const msg = document.getElementById('msgInput').value.trim();
+  const now = new Date();
+
+  sendBtn.disabled = true;
+  overlay.style.display = 'flex';
+
+  const jpTime = now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const gaTime = now.toLocaleString('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const moodLabel = selectedMood === 'good' ? '👍 All Good' : '🆘 Needs Help';
+
+  const entry = {
+    id: Date.now().toString(),
+    message: msg || '(No message)',
+    location: address,
+    lat: coords ? coords.lat : null,
+    lng: coords ? coords.lng : null,
+    address: address,
+    mood: moodLabel,
+    japan_time: jpTime,
+    georgia_time: gaTime,
+    created_at: now.toISOString()
+  };
+
+  try {
+    // Save to Supabase
+    await sb.from('checkins').insert(entry);
+
+    // Send email
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+      check_in_time: `Japan: ${jpTime}`,
+      georgia_time: `Georgia: ${gaTime}`,
+      mood: moodLabel,
+      message: msg || 'No message',
+      address: address,
+      lat: coords ? coords.lat.toFixed(5) : 'N/A',
+      lng: coords ? coords.lng.toFixed(5) : 'N/A',
+      to_email: 'jcarroll.av@gmail.com'
+    });
+
+    overlay.style.display = 'none';
+
+    if (selectedMood === 'help') {
+      showScreen('screenHelp');
+    } else {
+      // Show success screen
+      document.getElementById('successDetail').innerHTML = `
+        <div class="success-row"><div class="success-row-label">Status</div><div class="success-row-val">${moodLabel}</div></div>
+        <div class="success-row"><div class="success-row-label">Location</div><div class="success-row-val">${address}</div></div>
+        <div class="success-row"><div class="success-row-label">Japan time</div><div class="success-row-val">${jpTime}</div></div>
+        <div class="success-row"><div class="success-row-label">Georgia time</div><div class="success-row-val">${gaTime}</div></div>
+        ${msg ? `<div class="success-row"><div class="success-row-label">Message</div><div class="success-row-val">${msg}</div></div>` : ''}
+      `;
+      showScreen('screenSuccess');
+    }
+  } catch(e) {
+    console.error(e);
+    overlay.style.display = 'none';
+    sendBtn.disabled = false;
+    document.getElementById('statusText').textContent = '⚠ Something went wrong — try again';
+  }
+}
+
+// ── SCREEN MANAGEMENT ─────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function resetForm() {
+  selectedMood = null;
+  document.getElementById('msgInput').value = '';
+  document.getElementById('btnGood').classList.remove('selected-good');
+  document.getElementById('btnHelp').classList.remove('selected-help');
+  const sendBtn = document.getElementById('sendBtn');
+  sendBtn.className = 'send-btn';
+  sendBtn.disabled = true;
+  document.getElementById('sendLabel').textContent = 'Select a mood first';
+  document.getElementById('statusText').textContent = '';
+  showScreen('screenMain');
+  // Refresh location
+  initLocation();
+}
+
+// ── INIT ──────────────────────────────────────────────────
+initLocation();
+</script>
+</body>
+</html>
