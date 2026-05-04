@@ -220,6 +220,7 @@ tbody tr:hover td{background:#f5f5f8;}
 .itin-flight{background:#e8f0fe;}
 .itin-activity{background:#e8f5e9;}
 .itin-transport{background:#fce4ec;}
+.itin-event{background:#fef9c3;}
 .itin-other{background:#f3e5f5;}
 .itin-body{flex:1;}
 .itin-title{font-weight:600;font-size:14px;margin-bottom:3px;}
@@ -250,6 +251,7 @@ tbody tr:hover td{background:#f5f5f8;}
 .cal-event.trip{background:var(--green);}
 .cal-event.travel{background:var(--red);}
 .cal-event.free{background:#9ca3af;color:#fff;}
+.cal-event.event{background:#ca8a04;color:#fff;}
 
 /* SCHEDULE VIEW */
 .sched-week{margin-bottom:18px;}
@@ -266,6 +268,7 @@ tbody tr:hover td{background:#f5f5f8;}
 .sched-pill.activity{background:#fef3c7;color:#b8860b;}
 .sched-pill.travel{background:#fee2e2;color:#c0392b;}
 .sched-pill.free{background:#f3f4f6;color:#5a5a72;}
+.sched-pill.event{background:#fef9c3;color:#854d0e;}
 .sched-pill.hotel{background:#fffbf0;color:#b8860b;}
 .sched-pill.flight{background:#e8f0fe;color:#1a3a6b;}
 
@@ -340,7 +343,7 @@ tbody tr:hover td{background:#f5f5f8;}
 <div class="guide">
 
 <!-- HERO -->
-<div class="hero"> <div class="hero-tag">Georgia Tech LBAT Japan 2026 — Family Command Center</div> <h1>Owen's Japan Guide</h1> <div class="hero-sub">Beppu · Hiroshima · Kyoto/Osaka · Tokyo &nbsp;·&nbsp; May 15 – July 26, 2026</div> <div class="hero-meta"> <div class="hero-chip done">✓ Flights Booked</div> <div class="hero-chip done">✓ Passport Valid</div> <div class="hero-chip done">✓ Capital One Added</div> <div class="hero-chip" id="heroEsim">⏳ eSIM Needed</div> <div class="hero-chip" id="heroHotels">⏳ Hotels Jul 19–26</div> <div class="hero-chip" id="heroDomFlight">⏳ Domestic Flight Jul 25</div> </div>
+<div class="hero"> <div class="hero-tag">Georgia Tech LBAT Japan 2026 — Family Command Center</div> <h1>Owen's Japan Guide</h1> <div class="hero-sub">Beppu · Hiroshima · Kyoto/Osaka · Tokyo &nbsp;·&nbsp; May 15 – July 26, 2026</div> <div class="hero-meta"> </div>
 </div>
 
 <!-- PROGRESS -->
@@ -465,7 +468,7 @@ tbody tr:hover td{background:#f5f5f8;}
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- ITINERARY TAB -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section" id="itinerary"> <h2>Trip Itinerary <span class="kanji">旅程</span></h2> <div class="tip-block">Anyone can add hotels, bookings, and activities. All entries show who added them and sync to the calendar automatically.</div> <div class="itinerary-form"> <h3 style="margin-top:0;">+ Add Entry</h3> <div class="form-row"> <div class="form-group"> <label class="form-label">Your Name</label> <input class="form-input" id="itinName" placeholder="e.g. Owen, Dad, Mom" type="text"> </div> <div class="form-group"> <label class="form-label">Type</label> <select class="form-select" id="itinType"> <option value="hotel">🏨 Hotel</option> <option value="flight">✈ Flight / Transport</option> <option value="activity">🎌 Activity / Sightseeing</option> <option value="transport">🚄 Train / Bus</option> <option value="other">📝 Other</option> </select> </div> </div> <div class="form-row"> <div class="form-group"> <label class="form-label">Title</label> <input class="form-input" id="itinTitle" placeholder="e.g. Dormy Inn Hiroshima" type="text"> </div> <div class="form-group"> <label class="form-label">Location</label> <input class="form-input" id="itinLocation" placeholder="e.g. Hiroshima" type="text"> </div> </div> <div class="form-row"> <div class="form-group"> <label class="form-label">Start Date</label> <input class="form-input" id="itinStart" type="date"> </div> <div class="form-group"> <label class="form-label">End Date (optional)</label> <input class="form-input" id="itinEnd" type="date"> </div> </div> <div class="form-group" style="margin-bottom:12px;"> <label class="form-label">Notes / Confirmation # (optional)</label> <textarea class="form-textarea" id="itinNotes" placeholder="Booking reference, address, check-in time…"></textarea> </div> <button class="btn-primary" onclick="addItinEntry()">Add to Itinerary</button> </div> <div id="itinList"><div style="text-align:center;color:var(--muted);padding:20px;font-size:14px;">No entries yet — add your first booking above</div></div>
+<div class="section" id="itinerary"> <h2>Trip Itinerary <span class="kanji">旅程</span></h2> <div class="tip-block">Anyone can add hotels, bookings, activities, and events. All entries show who added them and sync to the calendar automatically.</div> <div class="itinerary-form"> <h3 style="margin-top:0;">+ Add Entry</h3> <div class="form-row"> <div class="form-group"> <label class="form-label">Your Name</label> <input class="form-input" id="itinName" placeholder="e.g. Owen, Dad, Mom" type="text"> </div> <div class="form-group"> <label class="form-label">Type</label> <select class="form-select" id="itinType"> <option value="hotel">🏨 Hotel</option> <option value="flight">✈ Flight / Transport</option> <option value="activity">🎌 Activity / Sightseeing</option> <option value="transport">🚄 Train / Bus</option> <option value="event">🎉 Event</option> <option value="other">📝 Other</option> </select> </div> </div> <div class="form-row"> <div class="form-group"> <label class="form-label">Title</label> <input class="form-input" id="itinTitle" placeholder="e.g. Dormy Inn Hiroshima" type="text"> </div> <div class="form-group"> <label class="form-label">Location</label> <input class="form-input" id="itinLocation" placeholder="e.g. Hiroshima" type="text"> </div> </div> <div class="form-row"> <div class="form-group"> <label class="form-label">Start Date</label> <input class="form-input" id="itinStart" type="date" min="2026-05-16" max="2026-07-31"> </div> <div class="form-group"> <label class="form-label">End Date (optional)</label> <input class="form-input" id="itinEnd" type="date" min="2026-05-16" max="2026-07-31"> </div> </div> <div class="form-group" style="margin-bottom:12px;"> <label class="form-label">Notes / Confirmation # (optional)</label> <textarea class="form-textarea" id="itinNotes" placeholder="Booking reference, address, check-in time…"></textarea> </div> <button class="btn-primary" onclick="addItinEntry()">Add to Itinerary</button> </div> <div id="itinList"><div style="text-align:center;color:var(--muted);padding:20px;font-size:14px;">No entries yet — add your first booking above</div></div>
 </div>
   </div><!-- end itinContent -->
 </div>
@@ -496,10 +499,63 @@ tbody tr:hover td{background:#f5f5f8;}
       <span style="background:#dbeafe;color:#1a3a6b;border-radius:6px;padding:3px 10px;font-weight:600;">📚 Class</span>
       <span style="background:#d1fae5;color:#1a6b3a;border-radius:6px;padding:3px 10px;font-weight:600;">🚌 Trip</span>
       <span style="background:#fef3c7;color:#b8860b;border-radius:6px;padding:3px 10px;font-weight:600;">🎭 Activity</span>
-      <span style="background:#fee2e2;color:#c0392b;border-radius:6px;padding:3px 10px;font-weight:600;">✈ Travel</span>
+      <span style="background:#fef9c3;color:#854d0e;border-radius:6px;padding:3px 10px;font-weight:600;">🎉 Event</span>
       <span style="background:#f3f4f6;color:#5a5a72;border-radius:6px;padding:3px 10px;font-weight:600;">🆓 Free</span>
     </div>
-    <div class="tip-block" style="margin-top:10px;">Events pre-loaded from the official 2026 LBAT schedule. Itinerary bookings added by Owen or family appear automatically and sync in real time.</div>
+    <div class="tip-block" style="margin-top:10px;">Events pre-loaded from the official 2026 LBAT schedule. Entries added below by Owen or family appear automatically and sync in real time.</div>
+
+    <!-- ADD TO CALENDAR FORM -->
+    <div style="margin-top:18px;">
+      <h2 style="font-size:18px;margin-bottom:14px;">＋ Add to Calendar <span class="kanji">追加</span></h2>
+      <div class="itinerary-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Your Name</label>
+            <input class="form-input" id="calEntryName" placeholder="e.g. Owen, Dad, Mom" type="text">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <select class="form-select" id="calEntryType">
+              <option value="event">🎉 Event</option>
+              <option value="hotel">🏨 Hotel</option>
+              <option value="flight">✈ Flight / Transport</option>
+              <option value="activity">🎌 Activity / Sightseeing</option>
+              <option value="transport">🚄 Train / Bus</option>
+              <option value="other">📝 Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input class="form-input" id="calEntryTitle" placeholder="e.g. Fireworks Festival" type="text">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location (optional)</label>
+            <input class="form-input" id="calEntryLocation" placeholder="e.g. Beppu" type="text">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input class="form-input" id="calEntryStart" type="date" min="2026-05-16" max="2026-07-31">
+          </div>
+          <div class="form-group">
+            <label class="form-label">End Date (optional)</label>
+            <input class="form-input" id="calEntryEnd" type="date" min="2026-05-16" max="2026-07-31">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label class="form-label">Notes (optional)</label>
+          <textarea class="form-textarea" id="calEntryNotes" placeholder="Details, address, time…" style="min-height:56px;"></textarea>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <button class="btn-primary" onclick="addCalEntry()">＋ Add to Calendar</button>
+          <span id="calEntryMsg" style="font-size:13px;color:var(--green);display:none;">✓ Added!</span>
+        </div>
+      </div>
+      <div id="calEntryList" style="margin-top:4px;"></div>
+    </div>
   </div>
 
   <!-- PROGRAM SCHEDULE VIEW -->
@@ -928,13 +984,61 @@ function setConvAmount(a){ document.getElementById('convInput').value=a; convert
 // ═══════════════════════════════════════════════════════════
 // ITINERARY
 // ═══════════════════════════════════════════════════════════
-const typeIcons={hotel:'🏨',flight:'✈',activity:'🎌',transport:'🚄',other:'📝'};
-const typeColors={hotel:'itin-hotel',flight:'itin-flight',activity:'itin-activity',transport:'itin-transport',other:'itin-other'};
+const typeIcons={hotel:'🏨',flight:'✈',activity:'🎌',transport:'🚄',event:'🎉',other:'📝'};
+const typeColors={hotel:'itin-hotel',flight:'itin-flight',activity:'itin-activity',transport:'itin-transport',event:'itin-event',other:'itin-other'};
 
-async function addItinEntry(){ const name=document.getElementById('itinName').value.trim(); const type=document.getElementById('itinType').value; const title=document.getElementById('itinTitle').value.trim(); const location=document.getElementById('itinLocation').value.trim(); const start=document.getElementById('itinStart').value; const end=document.getElementById('itinEnd').value; const notes=document.getElementById('itinNotes').value.trim(); if(!name||!title||!start){alert('Please fill in Your Name, Title, and Start Date');return;} const entry={id:Date.now().toString(),name,type,title,location,start,end,notes,created_at:new Date().toISOString()}; try{ const{error}=await sb.from('itinerary').insert(entry); if(error)throw error; ['itinName','itinTitle','itinLocation','itinStart','itinEnd','itinNotes'].forEach(id=>{document.getElementById(id).value='';}); loadItinerary(); loadCalendar(); }catch(e){console.error('Error:', e?.message || JSON.stringify(e));alert('Error saving: ' + (e?.message || JSON.stringify(e)));}
+const DATE_MIN='2026-05-16', DATE_MAX='2026-07-31';
+function validateDate(d){ return d && d>=DATE_MIN && d<=DATE_MAX; }
+
+async function addItinEntry(){ const name=document.getElementById('itinName').value.trim(); const type=document.getElementById('itinType').value; const title=document.getElementById('itinTitle').value.trim(); const location=document.getElementById('itinLocation').value.trim(); const start=document.getElementById('itinStart').value; const end=document.getElementById('itinEnd').value; const notes=document.getElementById('itinNotes').value.trim(); if(!name||!title||!start){alert('Please fill in Your Name, Title, and Start Date');return;} if(!validateDate(start)){alert('Date must be between May 16 and July 31, 2026');return;} if(end&&!validateDate(end)){alert('End date must be between May 16 and July 31, 2026');return;} const entry={id:Date.now().toString(),name,type,title,location,start,end,notes,created_at:new Date().toISOString()}; try{ const{error}=await sb.from('itinerary').insert(entry); if(error)throw error; ['itinName','itinTitle','itinLocation','itinStart','itinEnd','itinNotes'].forEach(id=>{document.getElementById(id).value='';}); loadItinerary(); loadCalendar(); }catch(e){console.error('Error:', e?.message || JSON.stringify(e));alert('Error saving: ' + (e?.message || JSON.stringify(e)));}
 }
 
-async function deleteItinEntry(id){ if(!confirm('Delete this entry?'))return; await sb.from('itinerary').delete().eq('id',id); loadItinerary();loadCalendar();
+async function addCalEntry(){
+  const name = document.getElementById('calEntryName').value.trim();
+  const type = document.getElementById('calEntryType').value;
+  const title = document.getElementById('calEntryTitle').value.trim();
+  const location = document.getElementById('calEntryLocation').value.trim();
+  const start = document.getElementById('calEntryStart').value;
+  const end = document.getElementById('calEntryEnd').value;
+  const notes = document.getElementById('calEntryNotes').value.trim();
+  if(!name||!title||!start){alert('Please fill in Your Name, Title, and Date');return;}
+  if(!validateDate(start)){alert('Date must be between May 16 and July 31, 2026');return;}
+  if(end&&!validateDate(end)){alert('End date must be between May 16 and July 31, 2026');return;}
+  const entry={id:Date.now().toString(),name,type,title,location,start,end,notes,created_at:new Date().toISOString()};
+  try{
+    const{error}=await sb.from('itinerary').insert(entry);
+    if(error)throw error;
+    ['calEntryName','calEntryTitle','calEntryLocation','calEntryStart','calEntryEnd','calEntryNotes'].forEach(id=>{document.getElementById(id).value='';});
+    const msg=document.getElementById('calEntryMsg');
+    if(msg){msg.style.display='inline';setTimeout(()=>{msg.style.display='none';},2500);}
+    loadItinerary(); loadCalendar(); loadCalEntryList();
+  }catch(e){console.error('Error:',e?.message||JSON.stringify(e));alert('Error saving: '+(e?.message||JSON.stringify(e)));}
+}
+
+async function loadCalEntryList(){
+  const list=document.getElementById('calEntryList');
+  if(!list)return;
+  try{
+    const{data}=await sb.from('itinerary').select('*').order('start',{ascending:true});
+    if(!data||data.length===0){list.innerHTML='';return;}
+    list.innerHTML=data.map(e=>`
+      <div class="itin-item">
+        <div class="itin-icon ${typeColors[e.type]||'itin-other'}">${typeIcons[e.type]||'📝'}</div>
+        <div class="itin-body">
+          <div class="itin-title">${e.title}</div>
+          <div class="itin-meta">
+            ${e.location?`<span>📍 ${e.location}</span>`:''}
+            <span>📅 ${e.start}${e.end&&e.end!==e.start?' → '+e.end:''}</span>
+          </div>
+          ${e.notes?`<div class="itin-notes">${e.notes}</div>`:''}
+          <div class="itin-added">Added by ${e.name}</div>
+        </div>
+        <div class="itin-actions"><button class="btn-danger" onclick="deleteItinEntry('${e.id}')">✕</button></div>
+      </div>`).join('');
+  }catch(err){console.error(err);}
+}
+
+async function deleteItinEntry(id){ if(!confirm('Delete this entry?'))return; await sb.from('itinerary').delete().eq('id',id); loadItinerary();loadCalendar();loadCalEntryList();
 }
 
 async function loadItinerary(){
@@ -1440,7 +1544,7 @@ function updateClocks(){ const now=new Date(); const ga=now.toLocaleTimeString('
 // ═══════════════════════════════════════════════════════════
 const TABS=['status','flights','checklist','money','itinerary','calendar','map','emergency','info'];
 
-function showTab(id){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn')[TABS.indexOf(id)].classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); if(id==='calendar')loadCalendar(); if(id==='itinerary')loadItinerary(); if(id==='map'){loadGoogleMapsScript();loadJournal();loadMapState();setTimeout(()=>{if(gmap){google.maps.event.trigger(gmap,'resize');}},200);} if(id==='checkin')loadCheckins();
+function showTab(id){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn')[TABS.indexOf(id)].classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); if(id==='calendar'){loadCalendar();loadCalEntryList();} if(id==='itinerary')loadItinerary(); if(id==='map'){loadGoogleMapsScript();loadJournal();loadMapState();setTimeout(()=>{if(gmap){google.maps.event.trigger(gmap,'resize');}},200);} if(id==='checkin')loadCheckins();
 }
 
 function showInner(id,btn){ const parent=btn.closest('.section'); parent.querySelectorAll('[id^="info"],[id^="map"],[id^="journal"]').forEach(el=>{ if(el.id!==id&&(el.id.startsWith('info')||el.id==='mapView'||el.id==='journalView'))el.style.display='none'; }); document.getElementById(id).style.display=''; parent.querySelectorAll('.inner-tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
@@ -1459,7 +1563,7 @@ if(countEl)countEl.textContent=diff>0?diff:'✈';
 // ═══════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════
-async function init(){ loadChecklist(); subscribeRealtime(); renderFlights(); loadExchangeRate(); loadCalendar(); updateClocks(); setInterval(updateClocks,1000); // Real-time subscriptions for other tables sb.channel('itin-live').on('postgres_changes',{event:'*',schema:'public',table:'itinerary'},()=>{loadItinerary();loadCalendar();}).subscribe(); sb.channel('map-live').on('postgres_changes',{event:'*',schema:'public',table:'map_visited'},payload=>{ const{location,visited}=payload.new||{}; if(!location)return; mapState[location]=visited; if(gmap) refreshMapMarkers(); renderVisitedList(); }).subscribe(); sb.channel('journal-live').on('postgres_changes',{event:'*',schema:'public',table:'journal'},()=>{loadJournal();}).subscribe();
+async function init(){ loadChecklist(); subscribeRealtime(); renderFlights(); loadExchangeRate(); loadCalendar(); updateClocks(); setInterval(updateClocks,1000); // Real-time subscriptions for other tables sb.channel('itin-live').on('postgres_changes',{event:'*',schema:'public',table:'itinerary'},()=>{loadItinerary();loadCalendar();loadCalEntryList();}).subscribe(); sb.channel('map-live').on('postgres_changes',{event:'*',schema:'public',table:'map_visited'},payload=>{ const{location,visited}=payload.new||{}; if(!location)return; mapState[location]=visited; if(gmap) refreshMapMarkers(); renderVisitedList(); }).subscribe(); sb.channel('journal-live').on('postgres_changes',{event:'*',schema:'public',table:'journal'},()=>{loadJournal();}).subscribe();
 }
 
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
