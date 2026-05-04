@@ -318,7 +318,7 @@ tbody tr:hover td{background:#f5f5f8;}
 <div class="guide">
 
 <!-- HERO -->
-<div class="hero"> <div class="hero-tag">Georgia Tech LBAT Japan 2026 — Family Command Center</div> <h1>Owen's Japan Guide</h1> <div class="hero-sub">Beppu · Hiroshima · Kyoto/Osaka · Tokyo &nbsp;·&nbsp; May 15 – July 26, 2026</div> <div class="hero-meta"> <div class="hero-chip done">✓ Flights Booked</div> <div class="hero-chip done">✓ Passport Valid</div> <div class="hero-chip done">✓ Capital One Added</div> <div class="hero-chip" id="heroEsim">⏳ eSIM Needed</div> <div class="hero-chip" id="heroHotels">⏳ Hotels Jul 19–26</div> <div class="hero-chip" id="heroDomFlight">⏳ Domestic Flight Jul 25</div> </div>
+<div class="hero"> <div class="hero-tag">Georgia Tech LBAT Japan 2026 — Family Command Center</div> <h1>Owen's Japan Guide</h1> <div class="hero-sub">Beppu · Hiroshima · Kyoto/Osaka · Tokyo &nbsp;·&nbsp; May 15 – July 26, 2026</div>
 </div>
 
 <!-- PROGRESS -->
@@ -332,7 +332,7 @@ tbody tr:hover td{background:#f5f5f8;}
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- STATUS TAB -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<div class="section active" id="status"> <h2>Family Dashboard <span class="kanji">家族</span></h2> <div class="dual-clock"> <div class="clock-box"> <div class="clock-label">🇺🇸 Georgia (EDT)</div> <div class="clock-time" id="clockGA">--:--</div> <div class="clock-date" id="dateGA"></div> </div> <div class="clock-box"> <div class="clock-label">🇯🇵 Japan (JST)</div> <div class="clock-time" id="clockJP">--:--</div> <div class="clock-date" id="dateJP"></div> </div> </div> <div class="card"><div id="countdown">—</div><div class="countdown-label">days until Owen boards his flight (May 15)</div></div> </div> </div>  
+<div class="section active" id="status"> <h2>Family Dashboard <span class="kanji">家族</span></h2> <div class="dual-clock"> <div class="clock-box"> <div class="clock-label">🇺🇸 Georgia (EDT)</div> <div class="clock-time" id="clockGA">--:--</div> <div class="clock-date" id="dateGA"></div> </div> <div class="clock-box"> <div class="clock-label">🇯🇵 Japan (JST)</div> <div class="clock-time" id="clockJP">--:--</div> <div class="clock-date" id="dateJP"></div> </div> </div> <div class="card"><div id="countdown">—</div><div class="countdown-label" id="countdownLabel">Loading…</div></div> </div> </div>  
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
@@ -1018,12 +1018,66 @@ function showInner(id,btn){ const parent=btn.closest('.section'); parent.querySe
 }
 
 // ═══════════════════════════════════════════════════════════
-// COUNTDOWN
+// COUNTDOWN — multi-phase
 // ═══════════════════════════════════════════════════════════
-const dep=new Date('2026-05-15T05:30:00');
-const diff=Math.ceil((dep-new Date())/86400000);
-const countEl=document.getElementById('countdown');
-if(countEl)countEl.textContent=diff>0?diff:'✈';
+const CD_DEPART        = new Date('2026-05-15T05:30:00-04:00');   // Boards ATL (EDT)
+const CD_LAND_JP       = new Date('2026-05-16T19:55:00+09:00');   // Lands Fukuoka (JST)
+const CD_RETURN_DEPART = new Date('2026-07-26T10:45:00+09:00');   // Departs Fukuoka (JST)
+const CD_RETURN_PACIFIC= new Date('2026-07-26T15:45:00+09:00');   // Departs Haneda across Pacific (JST)
+const CD_HOME          = new Date('2026-07-26T19:16:00-04:00');   // Lands ATL (EDT)
+
+function updateCountdown(){
+  const countEl = document.getElementById('countdown');
+  const labelEl = document.getElementById('countdownLabel');
+  if(!countEl || !labelEl) return;
+
+  const now = new Date();
+
+  if(now < CD_DEPART){
+    // Phase 1 — pre-departure
+    const days = Math.ceil((CD_DEPART - now) / 86400000);
+    countEl.style.color = 'var(--red)';
+    countEl.textContent = days;
+    labelEl.textContent = 'days until Owen boards his flight (May 15)';
+
+  } else if(now < CD_LAND_JP){
+    // Phase 2 — flying to Japan
+    const hoursLeft = Math.ceil((CD_LAND_JP - now) / 3600000);
+    countEl.style.color = 'var(--blue)';
+    countEl.textContent = '✈';
+    labelEl.textContent = `Owen is on his way to Japan! Lands Fukuoka in ~${hoursLeft} hour${hoursLeft!==1?'s':''} 🇯🇵`;
+
+  } else if(now < CD_RETURN_DEPART){
+    // Phase 3 — in Japan, counting down to departure
+    const daysIn   = Math.floor((now - CD_LAND_JP) / 86400000) + 1;
+    const daysLeft = Math.ceil((CD_RETURN_DEPART - now) / 86400000);
+    countEl.style.color = 'var(--green)';
+    countEl.textContent = daysLeft;
+    labelEl.textContent = `days until Owen leaves Japan · Day ${daysIn} in Japan 🎌`;
+
+  } else if(now < CD_RETURN_PACIFIC){
+    // Phase 4 — Fukuoka → Haneda domestic leg
+    countEl.style.color = 'var(--blue)';
+    countEl.textContent = '✈';
+    labelEl.textContent = 'Owen is flying home — Fukuoka → Tokyo Haneda right now ✈';
+
+  } else if(now < CD_HOME){
+    // Phase 5 — crossing the Pacific home
+    const hoursLeft = Math.ceil((CD_HOME - now) / 3600000);
+    countEl.style.color = 'var(--blue)';
+    countEl.textContent = '✈';
+    labelEl.textContent = `Owen is flying home across the Pacific — lands Atlanta in ~${hoursLeft} hour${hoursLeft!==1?'s':''} 🏠`;
+
+  } else {
+    // Phase 6 — home!
+    countEl.style.color = 'var(--green)';
+    countEl.textContent = '🏠';
+    labelEl.textContent = 'Owen is home! Welcome back! 🎉';
+  }
+}
+
+updateCountdown();
+setInterval(updateCountdown, 60000);
 
 // ═══════════════════════════════════════════════════════════
 // ITINERARY PASSWORD
