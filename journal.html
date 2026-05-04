@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Owen's Journal">
+<title>Owen's Journal</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --ink: #1a1a2e; --muted: #5a5a72; --border: #e0dff0; --bg: #f8f9fa;
+    --gold: #b8860b; --gold-light: #fffbf0;
+    --green: #1a6b3a; --red: #c0392b; --blue: #1a3a6b;
+  }
+  html, body { height: 100%; font-family: -apple-system, 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); overscroll-behavior: none; }
+
+  /* ── SCREENS ── */
+  .screen { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; }
+  .screen.active { display: flex; }
+
+  /* ── LOCK SCREEN ── */
+  .lock-screen { background: linear-gradient(160deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); }
+  .lock-bg-text { font-size: 80px; opacity: 0.07; position: absolute; top: 20px; right: 16px; line-height: 1; pointer-events: none; }
+  .lock-icon { font-size: 52px; margin-bottom: 16px; }
+  .lock-title { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 8px; text-align: center; }
+  .lock-sub { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 32px; text-align: center; line-height: 1.5; }
+  .lock-input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 14px 18px; font-size: 18px; color: #fff; width: 100%; max-width: 300px; text-align: center; letter-spacing: .2em; font-family: inherit; margin-bottom: 12px; }
+  .lock-input:focus { outline: none; border-color: rgba(255,255,255,0.5); }
+  .lock-btn { background: var(--gold); border: none; border-radius: 12px; padding: 14px 0; font-size: 16px; font-weight: 700; color: #fff; cursor: pointer; width: 100%; max-width: 300px; font-family: inherit; transition: all .2s; }
+  .lock-btn:active { transform: scale(.97); background: #9a7209; }
+  .lock-error { color: #f9c74f; font-size: 13px; margin-top: 8px; min-height: 18px; text-align: center; }
+
+  /* ── JOURNAL SCREEN ── */
+  .journal-screen { background: var(--bg); justify-content: flex-start; padding: 0; }
+  .j-header { background: var(--ink); color: #fff; padding: 20px 20px 16px; width: 100%; text-align: center; position: relative; }
+  .j-header-title { font-size: 18px; font-weight: 700; }
+  .j-header-sub { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+  .j-lock-out { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.12); border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px; color: rgba(255,255,255,0.7); cursor: pointer; font-family: inherit; }
+
+  .j-body { width: 100%; padding: 20px 20px 40px; flex: 1; overflow-y: auto; }
+
+  /* MOOD ROW */
+  .mood-label { font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .mood-row { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .mood-chip { background: #fff; border: 2px solid var(--border); border-radius: 20px; padding: 8px 14px; font-size: 14px; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; font-family: inherit; white-space: nowrap; }
+  .mood-chip:active { transform: scale(.96); }
+  .mood-chip.selected { border-color: var(--ink); background: var(--ink); color: #fff; }
+  .mood-chip .mood-e { font-size: 18px; }
+
+  /* FORM */
+  .field-label { font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; display: block; }
+  .field-input { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 15px; font-family: inherit; color: var(--ink); background: #fff; transition: border-color .15s; margin-bottom: 16px; }
+  .field-input:focus { outline: none; border-color: var(--ink); }
+  .field-textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 15px; font-family: inherit; color: var(--ink); background: #fff; resize: none; min-height: 140px; transition: border-color .15s; margin-bottom: 16px; line-height: 1.6; }
+  .field-textarea:focus { outline: none; border-color: var(--ink); }
+
+  .loc-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .loc-row .field-input { margin-bottom: 0; flex: 1; }
+  .loc-detect-btn { background: var(--ink); border: none; border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #fff; cursor: pointer; white-space: nowrap; font-family: inherit; flex-shrink: 0; }
+  .loc-detect-btn:active { background: #333; }
+
+  .loc-status { font-size: 12px; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; min-height: 18px; }
+  .loc-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
+  .loc-dot.active { background: var(--green); }
+  .loc-dot.error { background: var(--red); }
+
+  .save-btn { background: var(--ink); border: none; border-radius: 12px; padding: 16px 0; font-size: 17px; font-weight: 700; color: #fff; cursor: pointer; width: 100%; font-family: inherit; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .save-btn:active { transform: scale(.98); background: #333; }
+  .save-btn:disabled { background: var(--border); cursor: not-allowed; }
+  .save-feedback { text-align: center; font-size: 13px; color: var(--muted); margin-top: 12px; min-height: 18px; }
+
+  /* ── SUCCESS ── */
+  .success-screen { background: linear-gradient(160deg, #0d3320 0%, #1a6b3a 100%); }
+  .success-icon { font-size: 72px; margin-bottom: 16px; }
+  .success-title { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 10px; text-align: center; }
+  .success-sub { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.6; margin-bottom: 28px; text-align: center; }
+  .success-preview { background: rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 18px; width: 100%; max-width: 340px; margin-bottom: 24px; }
+  .preview-mood { font-size: 22px; margin-bottom: 6px; }
+  .preview-loc { font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+  .preview-text { font-size: 14px; color: rgba(255,255,255,0.9); line-height: 1.6; font-style: italic; }
+  .new-entry-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 13px 28px; font-size: 15px; color: #fff; cursor: pointer; font-family: inherit; }
+
+  /* RECENT ENTRIES */
+  .recent-label { font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin: 24px 0 12px; }
+  .entry-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+  .entry-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 8px; }
+  .entry-mood-loc { display: flex; align-items: center; gap: 8px; }
+  .entry-mood-emoji { font-size: 18px; }
+  .entry-location { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .entry-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .entry-text { font-size: 14px; color: var(--muted); line-height: 1.55; font-style: italic; }
+  .entry-delete { background: none; border: none; color: #ddd; cursor: pointer; font-size: 14px; padding: 2px 4px; flex-shrink: 0; }
+  .entry-delete:active { color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- ── LOCK SCREEN ── -->
+<div class="screen lock-screen active" id="screenLock">
+  <div class="lock-bg-text">日記</div>
+  <div class="lock-icon">📓</div>
+  <div class="lock-title">Owen's Journal</div>
+  <div class="lock-sub">Your private travel diary.<br>Family can read — only you can write.</div>
+  <input type="password" id="lockInput" class="lock-input" placeholder="••••••" maxlength="20"
+    onkeydown="if(event.key==='Enter')checkLock()">
+  <button class="lock-btn" onclick="checkLock()">Open Journal</button>
+  <div class="lock-error" id="lockError"></div>
+</div>
+
+<!-- ── JOURNAL ENTRY SCREEN ── -->
+<div class="screen journal-screen" id="screenJournal">
+  <div class="j-header">
+    <div class="j-header-title">📓 Owen's Journal</div>
+    <div class="j-header-sub" id="jHeaderDate"></div>
+    <button class="j-lock-out" onclick="lockOut()">🔒 Lock</button>
+  </div>
+
+  <div class="j-body">
+
+    <!-- MOOD -->
+    <div class="mood-label">How was it?</div>
+    <div class="mood-row" id="moodRow">
+      <button class="mood-chip" data-mood="🌟 Amazing"   onclick="selectMood(this)"><span class="mood-e">🌟</span> Amazing</button>
+      <button class="mood-chip" data-mood="😊 Good day"  onclick="selectMood(this)"><span class="mood-e">😊</span> Good day</button>
+      <button class="mood-chip" data-mood="😤 Tough day" onclick="selectMood(this)"><span class="mood-e">😤</span> Tough day</button>
+      <button class="mood-chip" data-mood="🍜 Food moment" onclick="selectMood(this)"><span class="mood-e">🍜</span> Food</button>
+      <button class="mood-chip" data-mood="🗺 Explored"  onclick="selectMood(this)"><span class="mood-e">🗺</span> Explored</button>
+      <button class="mood-chip" data-mood="🏫 Class day"  onclick="selectMood(this)"><span class="mood-e">🏫</span> Class</button>
+      <button class="mood-chip" data-mood="🌧 Rainy day"  onclick="selectMood(this)"><span class="mood-e">🌧</span> Rainy</button>
+      <button class="mood-chip" data-mood="🎌 Cultural"   onclick="selectMood(this)"><span class="mood-e">🎌</span> Cultural</button>
+    </div>
+
+    <!-- LOCATION -->
+    <label class="field-label">Where are you?</label>
+    <div class="loc-row">
+      <input class="field-input" id="jLoc" type="text" placeholder="e.g. Beppu, Kyoto, Hiroshima…">
+      <button class="loc-detect-btn" onclick="detectLocation()">📍 Detect</button>
+    </div>
+    <div class="loc-status"><div class="loc-dot" id="locDot"></div><span id="locLabel">Tap Detect to find your location</span></div>
+
+    <!-- ENTRY -->
+    <label class="field-label">What happened today?</label>
+    <textarea class="field-textarea" id="jText"
+      placeholder="Write anything — what you saw, ate, felt, laughed at, want to remember forever…"></textarea>
+
+    <!-- SAVE -->
+    <button class="save-btn" id="saveBtn" onclick="saveEntry()">
+      <span>✍️</span><span>Save to Journal</span>
+    </button>
+    <div class="save-feedback" id="saveFeedback"></div>
+
+    <!-- RECENT -->
+    <div class="recent-label">Recent Entries</div>
+    <div id="recentList"><div style="color:var(--muted);font-size:13px;text-align:center;padding:16px;">No entries yet</div></div>
+
+  </div>
+</div>
+
+<!-- ── SUCCESS SCREEN ── -->
+<div class="screen success-screen" id="screenSuccess">
+  <div class="success-icon">✅</div>
+  <div class="success-title">Entry Saved!</div>
+  <div class="success-sub">Your family can see it now<br>on the main guide.</div>
+  <div class="success-preview" id="successPreview"></div>
+  <button class="new-entry-btn" onclick="newEntry()">✍️ Write Another</button>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://fmlolwkndaqpxvfszswx.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtbG9sd2tuZGFxcHh2ZnN6c3d4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDMzMTksImV4cCI6MjA5MzQ3OTMxOX0.mDg9MlJ83KP2lzsi_7jvPN1tLmRvupBtZcS0Sj8ITXo';
+const JOURNAL_PASSWORD = 'beppu2026';
+const SESSION_KEY = 'journal_unlocked';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let selectedMood = '';
+let detectedCoords = null;
+
+// ── LOCK ──────────────────────────────────────────────────
+function checkLock() {
+  const val = document.getElementById('lockInput').value;
+  const err = document.getElementById('lockError');
+  if (val === JOURNAL_PASSWORD) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    showScreen('screenJournal');
+    loadRecent();
+    updateHeaderDate();
+  } else {
+    err.textContent = 'Wrong password — try again';
+    document.getElementById('lockInput').value = '';
+    document.getElementById('lockInput').focus();
+  }
+}
+
+function lockOut() {
+  sessionStorage.removeItem(SESSION_KEY);
+  document.getElementById('lockInput').value = '';
+  document.getElementById('lockError').textContent = '';
+  showScreen('screenLock');
+}
+
+// ── MOOD ──────────────────────────────────────────────────
+function selectMood(btn) {
+  document.querySelectorAll('.mood-chip').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedMood = btn.dataset.mood;
+}
+
+// ── LOCATION ─────────────────────────────────────────────
+async function detectLocation() {
+  const dot = document.getElementById('locDot');
+  const lbl = document.getElementById('locLabel');
+  const input = document.getElementById('jLoc');
+  dot.className = 'loc-dot';
+  lbl.textContent = 'Detecting…';
+  if (!navigator.geolocation) {
+    lbl.textContent = 'Location not available on this device';
+    dot.classList.add('error');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(async pos => {
+    detectedCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${detectedCoords.lat}&lon=${detectedCoords.lng}&format=json`);
+      const data = await res.json();
+      const parts = (data.display_name || '').split(',');
+      const place = parts.slice(0, 2).join(',').trim();
+      input.value = place;
+      lbl.textContent = place;
+      dot.classList.add('active');
+    } catch(e) {
+      input.value = `${detectedCoords.lat.toFixed(4)}, ${detectedCoords.lng.toFixed(4)}`;
+      dot.classList.add('active');
+      lbl.textContent = 'Location found';
+    }
+  }, () => {
+    dot.classList.add('error');
+    lbl.textContent = 'Could not detect — type it in manually';
+  }, { enableHighAccuracy: true, timeout: 10000 });
+}
+
+// ── SAVE ──────────────────────────────────────────────────
+async function saveEntry() {
+  const text = document.getElementById('jText').value.trim();
+  const loc = document.getElementById('jLoc').value.trim();
+  const feedback = document.getElementById('saveFeedback');
+  const saveBtn = document.getElementById('saveBtn');
+
+  if (!text) { feedback.textContent = 'Write something first!'; return; }
+
+  saveBtn.disabled = true;
+  feedback.textContent = 'Saving…';
+
+  const now = new Date();
+  const jpTime = now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+  const entry = {
+    id: Date.now().toString(),
+    name: 'Owen',
+    location: loc || 'Japan',
+    text: text,
+    mood: selectedMood || '📓 Entry',
+    japan_time: jpTime,
+    created_at: now.toISOString()
+  };
+
+  try {
+    const { error } = await sb.from('journal').insert(entry);
+    if (error) throw error;
+
+    // Show success screen
+    document.getElementById('successPreview').innerHTML = `
+      <div class="preview-mood">${(selectedMood || '📓').split(' ')[0]}</div>
+      ${loc ? `<div class="preview-loc">📍 ${loc} · ${jpTime}</div>` : `<div class="preview-loc">${jpTime}</div>`}
+      <div class="preview-text">"${text.length > 120 ? text.substring(0, 120) + '…' : text}"</div>
+    `;
+    showScreen('screenSuccess');
+  } catch(e) {
+    console.error(e);
+    saveBtn.disabled = false;
+    feedback.textContent = '⚠ Could not save — check your connection';
+  }
+}
+
+// ── NEW ENTRY ─────────────────────────────────────────────
+function newEntry() {
+  document.getElementById('jText').value = '';
+  document.getElementById('jLoc').value = '';
+  document.getElementById('saveFeedback').textContent = '';
+  document.getElementById('saveBtn').disabled = false;
+  document.getElementById('locDot').className = 'loc-dot';
+  document.getElementById('locLabel').textContent = 'Tap Detect to find your location';
+  document.querySelectorAll('.mood-chip').forEach(b => b.classList.remove('selected'));
+  selectedMood = '';
+  detectedCoords = null;
+  showScreen('screenJournal');
+  loadRecent();
+}
+
+// ── LOAD RECENT ───────────────────────────────────────────
+async function loadRecent() {
+  try {
+    const { data } = await sb.from('journal').select('*').order('created_at', { ascending: false }).limit(5);
+    const list = document.getElementById('recentList');
+    if (!data || data.length === 0) {
+      list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:16px;">No entries yet — write your first one above!</div>';
+      return;
+    }
+    list.innerHTML = data.map(e => `
+      <div class="entry-card">
+        <div class="entry-header">
+          <div class="entry-mood-loc">
+            <span class="entry-mood-emoji">${(e.mood || '📓').split(' ')[0]}</span>
+            <span class="entry-location">${e.location || 'Japan'}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="entry-date">${e.japan_time || new Date(e.created_at).toLocaleDateString()}</div>
+            <button class="entry-delete" onclick="deleteEntry('${e.id}')">✕</button>
+          </div>
+        </div>
+        <div class="entry-text">${e.text.length > 150 ? e.text.substring(0, 150) + '…' : e.text}</div>
+      </div>
+    `).join('');
+  } catch(e) { console.error(e); }
+}
+
+async function deleteEntry(id) {
+  if (!confirm('Delete this entry?')) return;
+  try {
+    await sb.from('journal').delete().eq('id', id);
+    loadRecent();
+  } catch(e) { console.error(e); }
+}
+
+// ── UTILS ─────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function updateHeaderDate() {
+  const el = document.getElementById('jHeaderDate');
+  if (!el) return;
+  const now = new Date();
+  el.textContent = now.toLocaleDateString('en-US', { timeZone: 'Asia/Tokyo', weekday: 'long', month: 'long', day: 'numeric' }) + ' · Japan Time';
+}
+
+// ── INIT ──────────────────────────────────────────────────
+if (sessionStorage.getItem(SESSION_KEY) === '1') {
+  showScreen('screenJournal');
+  loadRecent();
+  updateHeaderDate();
+}
+
+// Allow Enter key on lock screen
+document.getElementById('lockInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkLock();
+});
+</script>
+</body>
+</html>
