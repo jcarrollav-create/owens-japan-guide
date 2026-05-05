@@ -1185,7 +1185,7 @@ const PROG_WEEKS = [
       { date:'Wed Jun 10', icon:'📚', label:'科学技術日本語 20 & 21' },
       { date:'Thu Jun 11', icon:'📚', label:'科学技術日本語 22 & 23' },
       { date:'Fri Jun 12', icon:'📚', label:'Conversation Practicum 10 · 科学技術日本語 24' },
-      { date:'Sat Jun 13', icon:'🆓', label:'Free day — rainy season begins (tsuyu). Explore Beppu's indoor onsens.' },
+      { date:'Sat Jun 13', icon:'🆓', label:'Free day — rainy season begins (tsuyu). Explore Beppu\'s indoor onsens.' },
       { date:'Sun Jun 14', icon:'🆓', label:'Free day' },
     ]
   },
