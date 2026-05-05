@@ -225,11 +225,35 @@ const CITY_MAP = {
 };
 const PIN_NAMES = { beppu:'Beppu (APU)', fukuoka:'Fukuoka', hiroshima:'Hiroshima', miyajima:'Miyajima Island', kyoto:'Kyoto', osaka:'Osaka', tokyo:'Tokyo' };
 
+function formatAddress(address = {}, fallback = '') {
+  const house = address.house_number || '';
+  const road = address.road || address.pedestrian || address.footway || address.path || '';
+  const street = [house, road].filter(Boolean).join(' ').trim();
+  const area = address.neighbourhood || address.suburb || address.quarter || address.city_district || '';
+  const city = address.city || address.town || address.village || address.municipality || address.county || address.state || '';
+  const parts = [];
+  if (street) parts.push(street);
+  else if (address.name || fallback) parts.push(address.name || fallback.split(',')[0]?.trim());
+  if (area && area !== city) parts.push(area);
+  if (city) parts.push(city);
+  return parts.filter(Boolean).join(', ') || fallback;
+}
+
 function resolvePin(loc) {
   if (!loc) return null;
   const l = loc.toLowerCase();
   for (const [k,v] of Object.entries(CITY_MAP)) { if (l.includes(k)) return v; }
   return null;
+}
+
+function parseCoordsFromText(value) {
+  const match = String(value || '').match(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/);
+  if (!match) return null;
+  const lat = Number(match[1]);
+  const lng = Number(match[2]);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+  return { lat, lng };
 }
 
 function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
@@ -257,25 +281,18 @@ async function detectLoc() {
     coords={lat:pos.coords.latitude,lng:pos.coords.longitude};
     try {
       const d=await (await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json&addressdetails=1`)).json();
-      // Use structured address fields — city/town/village/suburb in order of preference
       const a = d.address || {};
-      const city = a.city || a.town || a.village || a.suburb || a.county || a.state || '';
-      const country = a.country_code === 'jp' ? 'Japan' : (a.country || '');
-      const place = city ? (country ? `${city}, ${country}` : city) : (d.display_name||'').split(',').slice(0,2).join(',').trim();
+      const place = formatAddress(a, d.display_name || '');
       inp.value=place; lbl.textContent='📍 ' + place; dot.className='loc-dot ok';
     } catch { inp.value=`${coords.lat.toFixed(4)},${coords.lng.toFixed(4)}`; dot.className='loc-dot ok'; lbl.textContent='Location found'; }
   }, (err)=>{dot.className='loc-dot err';lbl.textContent='Could not detect — type city name manually';},{enableHighAccuracy:true,timeout:10000});
 }
 
-async function dropPin(loc) {
-  const id=resolvePin(loc); droppedPin=id;
-  if (!id) return;
-  try {
-    await sb.from('map_visited').upsert({location:id,visited:true,updated_at:new Date().toISOString()},{onConflict:'location'});
-    document.getElementById('locDot').className='loc-dot pin';
-    document.getElementById('pinMsg').textContent=`📍 Map pin dropped for ${PIN_NAMES[id]||id} on the family guide!`;
-    const t=document.getElementById('pinToast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),4000);
-  } catch(e){console.error(e);}
+function showPinSaved(loc) {
+  droppedPin = true;
+  document.getElementById('locDot').className='loc-dot pin';
+  document.getElementById('pinMsg').textContent=`📍 Map pin added for ${loc || 'this journal entry'} on the family guide!`;
+  const t=document.getElementById('pinToast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),4000);
 }
 
 async function saveEntry() {
@@ -286,26 +303,26 @@ async function saveEntry() {
   btn.disabled=true; fb.textContent='Saving…';
   const now=new Date();
   const jpTime=now.toLocaleString('en-US',{timeZone:'Asia/Tokyo',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-  // Include coords if we detected GPS location
+  const entryCoords = coords || parseCoordsFromText(loc);
+  // Include coordinates from GPS or from a manually typed "lat,lng" value.
   const entry={
     id:Date.now().toString(),name:'Owen',
     location:loc||'Japan',text,
     mood:mood||'📓 Entry',japan_time:jpTime,
     created_at:now.toISOString(),
-    lat: coords ? coords.lat : null,
-    lng: coords ? coords.lng : null
+    lat: entryCoords ? entryCoords.lat : null,
+    lng: entryCoords ? entryCoords.lng : null
   };
   try {
     const{error}=await sb.from('journal').insert(entry);
     if(error)throw error;
-    const pinId=resolvePin(loc);
-    // Only drop a pin if we have a recognised city
-    if(loc && pinId) await dropPin(loc);
+    const hasCoords = Number.isFinite(entry.lat) && Number.isFinite(entry.lng);
+    if (hasCoords) showPinSaved(loc);
     document.getElementById('sucPreview').innerHTML=`
       <div class="suc-mood">${(mood||'📓').split(' ')[0]}</div>
       <div class="suc-loc">${loc?'📍 '+loc+' · ':''} ${jpTime}</div>
       <div class="suc-text">"${text.length>120?text.slice(0,120)+'…':text}"</div>
-      ${pinId?`<div class="suc-pin">📍 Map pin dropped for ${PIN_NAMES[pinId]||pinId} on the family guide!</div>`:''}
+      ${hasCoords?`<div class="suc-pin">📍 Map pin added on the family guide!</div>`:''}
     `;
     showScreen('screenSuccess');
   } catch(e){console.error(e);btn.disabled=false;fb.textContent='⚠ Could not save — check connection';}

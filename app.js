@@ -455,13 +455,6 @@ function subscribeRealtime() {
   sb.channel('journal-live')
     .on('postgres_changes', { event:'*', schema:'public', table:'journal' }, () => {
       loadJournal();
-      // New journal entry might mean a new map pin should appear
-      loadMapState();
-    }).subscribe();
-
-  sb.channel('map-live')
-    .on('postgres_changes', { event:'*', schema:'public', table:'map_visited' }, payload => {
-      // Re-run full loadMapState so journal cross-check is always applied
       loadMapState();
     }).subscribe();
 }
@@ -752,19 +745,7 @@ function resolveJournalPin(locationStr) {
 }
 
 async function dropJournalPin(locationStr) {
-  const locId = resolveJournalPin(locationStr);
-  if (!locId) return; // unknown location — don't drop pin
-  // Mark as visited in state + map
-  mapState[locId] = true;
-  if (gmap) refreshMapMarkers();
-  renderVisitedList();
-  // Persist to Supabase map_visited
-  try {
-    await sb.from('map_visited').upsert(
-      { location: locId, visited: true, updated_at: new Date().toISOString() },
-      { onConflict: 'location' }
-    );
-  } catch(e) { console.error('Pin drop error:', e?.message || JSON.stringify(e)); }
+  loadMapState();
 }
 
 async function addJournalEntry() {
@@ -784,8 +765,7 @@ async function addJournalEntry() {
       if (el) el.value = '';
     });
     loadJournal();
-    // Drop a map pin for the location if recognizable
-    if (location) dropJournalPin(location);
+    loadMapState();
   } catch(e) {
     console.error('Journal error:', e?.message || JSON.stringify(e));
     alert('Error saving: ' + (e?.message || JSON.stringify(e)));
@@ -817,6 +797,7 @@ async function loadJournal() {
 // ─── MAP ──────────────────────────────────────────────────
 let gmap = null;
 let gmapMarkers = {};
+let journalMapEntries = [];
 const mapState = {};
 
 const MAP_LOCATIONS = [
@@ -828,6 +809,10 @@ const MAP_LOCATIONS = [
   { id:'tokyo',     name:'Tokyo',          lat:35.6762, lng:139.6503, emoji:'🗼', desc:'Shibuya · Shinjuku · Akihabara · Senso-ji' },
   { id:'miyajima',  name:'Miyajima Island',lat:34.2955, lng:132.3197, emoji:'⛩', desc:'Floating torii gate · day trip from Hiroshima by JR ferry' },
 ];
+
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
 
 function initGoogleMap() {
   if (typeof google === 'undefined') return;
@@ -843,40 +828,7 @@ function initGoogleMap() {
     ],
     disableDefaultUI: false, zoomControl: true, mapTypeControl: false, streetViewControl: false,
   });
-
-  MAP_LOCATIONS.forEach(loc => {
-    const isVisited = mapState[loc.id] === true;
-    const marker = new google.maps.Marker({
-      position: { lat: loc.lat, lng: loc.lng }, map: gmap, title: loc.name,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: isVisited ? '#c84f45' : '#ffffff', fillOpacity: 1,
-        strokeColor: isVisited ? '#922b21' : '#17182c', strokeWeight: 2.5,
-        scale: isVisited ? 14 : 11,
-      },
-      label: { text: loc.emoji, fontSize: isVisited ? '16px' : '13px' },
-      animation: google.maps.Animation.DROP,
-    });
-
-    const infoWindow = new google.maps.InfoWindow({
-      content: `
-        <div style="font-family:'DM Sans',sans-serif;padding:6px 4px;min-width:180px;">
-          <div style="font-size:15px;font-weight:700;color:#17182c;margin-bottom:4px;">${loc.emoji} ${loc.name}</div>
-          <div style="font-size:12px;color:#5a5a72;line-height:1.5;margin-bottom:10px;">${loc.desc}</div>
-          <button onclick="toggleMapPin('${loc.id}')"
-            style="background:${mapState[loc.id]?'#c84f45':'#1f7a4d'};color:#fff;border:none;border-radius:6px;
-                   padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;width:100%;font-family:inherit;">
-            ${mapState[loc.id] ? '✓ Visited — Click to Unmark' : '📍 Mark as Visited'}
-          </button>
-        </div>`
-    });
-
-    marker.addListener('click', () => {
-      Object.values(gmapMarkers).forEach(m => { if(m.iw) m.iw.close(); });
-      infoWindow.open(gmap, marker);
-    });
-    gmapMarkers[loc.id] = { marker, iw: infoWindow };
-  });
+  refreshMapMarkers();
 }
 
 function loadGoogleMapsScript() {
@@ -890,19 +842,12 @@ function loadGoogleMapsScript() {
 
 async function loadMapState() {
   try {
-    // Only show pins that have a matching journal entry location
-    // This ensures the map starts empty and pins only appear when Owen writes
-    const [mapRes, journalRes] = await Promise.all([
-      sb.from('map_visited').select('*'),
-      sb.from('journal').select('location')
-    ]);
-    const visitedRows = mapRes.data || [];
-    const journalLocs = (journalRes.data || []).map(e => resolveJournalPin(e.location)).filter(Boolean);
-    const journalLocSet = new Set(journalLocs);
-
-    // A pin is active only if map_visited says visited AND there is a journal entry for it
-    visitedRows.forEach(r => {
-      mapState[r.location] = r.visited && journalLocSet.has(r.location);
+    const { data, error } = await sb.from('journal').select('*').order('created_at', { ascending: true });
+    if (error) throw error;
+    journalMapEntries = (data || []).filter(e => {
+      const lat = Number(e.lat);
+      const lng = Number(e.lng);
+      return Number.isFinite(lat) && Number.isFinite(lng);
     });
     renderVisitedList();
     if (gmap) refreshMapMarkers();
@@ -910,47 +855,59 @@ async function loadMapState() {
 }
 
 function refreshMapMarkers() {
-  MAP_LOCATIONS.forEach(loc => {
-    const m = gmapMarkers[loc.id];
-    if (!m) return;
-    const visited = mapState[loc.id] === true;
-    m.marker.setIcon({
-      path: google.maps.SymbolPath.CIRCLE,
-      fillColor: visited ? '#c84f45' : '#ffffff', fillOpacity: 1,
-      strokeColor: visited ? '#922b21' : '#17182c', strokeWeight: 2.5,
-      scale: visited ? 14 : 11,
+  if (!gmap || typeof google === 'undefined') return;
+  Object.values(gmapMarkers).forEach(m => {
+    if (m.iw) m.iw.close();
+    if (m.marker) m.marker.setMap(null);
+  });
+  gmapMarkers = {};
+
+  journalMapEntries.forEach(entry => {
+    const lat = Number(entry.lat);
+    const lng = Number(entry.lng);
+    const emoji = (entry.mood || '📓').split(' ')[0];
+    const title = entry.location || 'Journal entry';
+    const marker = new google.maps.Marker({
+      position: { lat, lng }, map: gmap, title,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: '#c84f45', fillOpacity: 1,
+        strokeColor: '#922b21', strokeWeight: 2.5,
+        scale: 14,
+      },
+      label: { text: emoji, fontSize: '16px' },
+      animation: google.maps.Animation.DROP,
     });
-    m.marker.setLabel({ text: MAP_LOCATIONS.find(l=>l.id===loc.id).emoji, fontSize: visited ? '16px' : '13px' });
+
+    const text = escapeHtml(entry.text || '');
+    const location = escapeHtml(entry.location || 'Journal location');
+    const when = entry.japan_time || new Date(entry.created_at).toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    const infoWindow = new google.maps.InfoWindow({
+      content: `
+        <div style="font-family:'DM Sans',sans-serif;padding:6px 4px;min-width:190px;">
+          <div style="font-size:15px;font-weight:700;color:#17182c;margin-bottom:4px;">${emoji} ${location}</div>
+          <div style="font-size:11px;color:#8b5e3c;margin-bottom:8px;">${when}</div>
+          <div style="font-size:12px;color:#5a5a72;line-height:1.5;">${text.length > 140 ? text.slice(0,140) + '...' : text}</div>
+        </div>`
+    });
+
+    marker.addListener('click', () => {
+      Object.values(gmapMarkers).forEach(m => { if(m.iw) m.iw.close(); });
+      infoWindow.open(gmap, marker);
+    });
+    gmapMarkers[entry.id] = { marker, iw: infoWindow };
   });
 }
-
-async function toggleMapPin(locId) {
-  const newVal = !(mapState[locId] === true);
-  mapState[locId] = newVal;
-  renderVisitedList();
-  if (gmap) refreshMapMarkers();
-  Object.values(gmapMarkers).forEach(m => { if(m.iw) m.iw.close(); });
-  try {
-    await sb.from('map_visited').upsert(
-      { location: locId, visited: newVal, updated_at: new Date().toISOString() },
-      { onConflict: 'location' }
-    );
-  } catch(e) { console.error('Map pin error:', e?.message || JSON.stringify(e)); }
-}
-
-function markPinVisited(locId)  { mapState[locId] = true;  if(gmap) refreshMapMarkers(); }
-function unmarkPin(locId)       { mapState[locId] = false; if(gmap) refreshMapMarkers(); }
 
 function renderVisitedList() {
   const list = document.getElementById('visitedList');
   if (!list) return;
-  const visited = MAP_LOCATIONS.filter(l => mapState[l.id] === true);
-  if (!visited.length) {
-    list.innerHTML = '<span style="font-size:13px;color:var(--muted);">Tap a pin on the map to mark locations as visited</span>';
+  if (!journalMapEntries.length) {
+    list.innerHTML = '<span style="font-size:13px;color:var(--muted);">Journal entries with detected coordinates will appear here as map pins.</span>';
     return;
   }
-  list.innerHTML = visited.map(l =>
-    `<span style="background:var(--red-light);color:var(--red);border-radius:16px;padding:5px 12px;font-size:13px;font-weight:600;">${l.emoji} ${l.name}</span>`
+  list.innerHTML = journalMapEntries.map(e =>
+    `<span style="background:var(--red-light);color:var(--red);border-radius:16px;padding:5px 12px;font-size:13px;font-weight:600;">${escapeHtml((e.mood||'📓').split(' ')[0])} ${escapeHtml(e.location || 'Journal pin')}</span>`
   ).join('');
 }
 
