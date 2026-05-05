@@ -724,6 +724,45 @@ function renderEvents() {
 }
 
 // ─── JOURNAL ──────────────────────────────────────────────
+
+// Known city → MAP_LOCATIONS id mapping for pin drops
+const JOURNAL_CITY_MAP = {
+  'beppu':     'beppu',     'oita':      'beppu',
+  'fukuoka':   'fukuoka',   'hakata':    'fukuoka',
+  'hiroshima': 'hiroshima', 'miyajima':  'miyajima',
+  'kyoto':     'kyoto',     'nara':      'kyoto',
+  'osaka':     'osaka',     'kobe':      'osaka',
+  'tokyo':     'tokyo',     'shinjuku':  'tokyo',
+  'shibuya':   'tokyo',     'asakusa':   'tokyo',
+  'akihabara': 'tokyo',     'haneda':    'tokyo',
+  'narita':    'tokyo',     'yokohama':  'tokyo',
+};
+
+function resolveJournalPin(locationStr) {
+  if (!locationStr) return null;
+  const lower = locationStr.toLowerCase();
+  for (const [keyword, locId] of Object.entries(JOURNAL_CITY_MAP)) {
+    if (lower.includes(keyword)) return locId;
+  }
+  return null;
+}
+
+async function dropJournalPin(locationStr) {
+  const locId = resolveJournalPin(locationStr);
+  if (!locId) return; // unknown location — don't drop pin
+  // Mark as visited in state + map
+  mapState[locId] = true;
+  if (gmap) refreshMapMarkers();
+  renderVisitedList();
+  // Persist to Supabase map_visited
+  try {
+    await sb.from('map_visited').upsert(
+      { location: locId, visited: true, updated_at: new Date().toISOString() },
+      { onConflict: 'location' }
+    );
+  } catch(e) { console.error('Pin drop error:', e?.message || JSON.stringify(e)); }
+}
+
 async function addJournalEntry() {
   const name     = document.getElementById('jName')?.value.trim();
   const location = document.getElementById('jLocation')?.value.trim();
@@ -741,6 +780,8 @@ async function addJournalEntry() {
       if (el) el.value = '';
     });
     loadJournal();
+    // Drop a map pin for the location if recognizable
+    if (location) dropJournalPin(location);
   } catch(e) {
     console.error('Journal error:', e?.message || JSON.stringify(e));
     alert('Error saving: ' + (e?.message || JSON.stringify(e)));

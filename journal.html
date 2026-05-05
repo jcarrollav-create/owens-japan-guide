@@ -6,128 +6,380 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Owen's Journal">
-<title>Owen's Journal</title>
+<title>Owen's Journal 日記</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  :root {
-    --ink: #1a1a2e; --muted: #5a5a72; --border: #e0dff0; --bg: #f8f9fa;
-    --gold: #b8860b; --gold-light: #fffbf0;
-    --green: #1a6b3a; --red: #c0392b; --blue: #1a3a6b;
-  }
-  html, body { height: 100%; font-family: -apple-system, 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); overscroll-behavior: none; }
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-  /* ── SCREENS ── */
-  .screen { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; }
-  .screen.active { display: flex; }
+:root {
+  --bg:           #1a1228;
+  --bg2:          #261838;
+  --bg3:          #321f47;
+  --coral:        #c84f45;
+  --sakura:       #e7a3a8;
+  --gold:         #f9c74f;
+  --green:        #1f7a4d;
+  --border:       rgba(231,163,168,0.15);
+  --border-strong:rgba(231,163,168,0.28);
+  --muted:        rgba(231,163,168,0.55);
+  --subtle:       rgba(255,255,255,0.3);
+}
 
-  /* ── LOCK SCREEN ── */
-  .lock-screen { background: linear-gradient(160deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); }
-  .lock-bg-text { font-size: 80px; opacity: 0.07; position: absolute; top: 20px; right: 16px; line-height: 1; pointer-events: none; }
-  .lock-icon { font-size: 52px; margin-bottom: 16px; }
-  .lock-title { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 8px; text-align: center; }
-  .lock-sub { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 32px; text-align: center; line-height: 1.5; }
-  .lock-input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 14px 18px; font-size: 18px; color: #fff; width: 100%; max-width: 300px; text-align: center; letter-spacing: .2em; font-family: inherit; margin-bottom: 12px; }
-  .lock-input:focus { outline: none; border-color: rgba(255,255,255,0.5); }
-  .lock-btn { background: var(--gold); border: none; border-radius: 12px; padding: 14px 0; font-size: 16px; font-weight: 700; color: #fff; cursor: pointer; width: 100%; max-width: 300px; font-family: inherit; transition: all .2s; }
-  .lock-btn:active { transform: scale(.97); background: #9a7209; }
-  .lock-error { color: #f9c74f; font-size: 13px; margin-top: 8px; min-height: 18px; text-align: center; }
+html, body {
+  height: 100%;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background: var(--bg);
+  color: #fff;
+  overscroll-behavior: none;
+}
 
-  /* ── JOURNAL SCREEN ── */
-  .journal-screen { background: var(--bg); justify-content: flex-start; padding: 0; }
-  .j-header { background: var(--ink); color: #fff; padding: 20px 20px 16px; width: 100%; text-align: center; position: relative; }
-  .j-header-title { font-size: 18px; font-weight: 700; }
-  .j-header-sub { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 3px; }
-  .j-lock-out { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.12); border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px; color: rgba(255,255,255,0.7); cursor: pointer; font-family: inherit; }
+/* ── SCREENS ── */
+.screen { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; }
+.screen.active { display: flex; }
 
-  .j-body { width: 100%; padding: 20px 20px 40px; flex: 1; overflow-y: auto; }
+/* ════════════════════════════════════
+   LOCK SCREEN
+════════════════════════════════════ */
+.lock-screen {
+  position: relative; overflow: hidden;
+  background: var(--bg);
+  padding: 40px 28px;
+}
 
-  /* MOOD ROW */
-  .mood-label { font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-  .mood-row { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
-  .mood-chip { background: #fff; border: 2px solid var(--border); border-radius: 20px; padding: 8px 14px; font-size: 14px; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; font-family: inherit; white-space: nowrap; }
-  .mood-chip:active { transform: scale(.96); }
-  .mood-chip.selected { border-color: var(--ink); background: var(--ink); color: #fff; }
-  .mood-chip .mood-e { font-size: 18px; }
+/* Hero image on lock screen */
+.lock-hero {
+  position: absolute; inset: 0;
+  background-image: url('japan_hero.jpg');
+  background-size: cover;
+  background-position: center 30%;
+  z-index: 0;
+}
+.lock-hero-grad {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(to bottom,
+    rgba(26,18,40,0.55) 0%,
+    rgba(26,18,40,0.82) 55%,
+    #1a1228 100%);
+}
 
-  /* FORM */
-  .field-label { font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; display: block; }
-  .field-input { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 15px; font-family: inherit; color: var(--ink); background: #fff; transition: border-color .15s; margin-bottom: 16px; }
-  .field-input:focus { outline: none; border-color: var(--ink); }
-  .field-textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 15px; font-family: inherit; color: var(--ink); background: #fff; resize: none; min-height: 140px; transition: border-color .15s; margin-bottom: 16px; line-height: 1.6; }
-  .field-textarea:focus { outline: none; border-color: var(--ink); }
+.lock-content {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column;
+  align-items: center; width: 100%; max-width: 340px;
+}
 
-  .loc-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
-  .loc-row .field-input { margin-bottom: 0; flex: 1; }
-  .loc-detect-btn { background: var(--ink); border: none; border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #fff; cursor: pointer; white-space: nowrap; font-family: inherit; flex-shrink: 0; }
-  .loc-detect-btn:active { background: #333; }
+.lock-kanji {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 52px; opacity: 0.12;
+  position: absolute; top: -60px; right: -10px;
+  pointer-events: none; color: var(--sakura);
+  line-height: 1;
+}
+.lock-icon { font-size: 46px; margin-bottom: 14px; }
+.lock-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 28px; font-weight: 700; color: #fff;
+  margin-bottom: 6px; text-align: center;
+}
+.lock-sub {
+  font-size: 13.5px; color: var(--muted);
+  margin-bottom: 32px; text-align: center; line-height: 1.6;
+}
+.lock-input {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px; padding: 14px 18px;
+  font-size: 20px; color: #fff; width: 100%;
+  text-align: center; letter-spacing: .25em;
+  font-family: inherit; margin-bottom: 12px;
+  transition: border-color .15s;
+}
+.lock-input:focus { outline: none; border-color: var(--sakura); }
+.lock-input::placeholder { color: var(--subtle); letter-spacing: .1em; font-size: 14px; }
+.lock-btn {
+  background: var(--coral); border: none;
+  border-radius: 12px; padding: 14px 0;
+  font-size: 16px; font-weight: 700; color: #fff;
+  cursor: pointer; width: 100%; font-family: inherit;
+  transition: all .18s; box-shadow: 0 4px 20px rgba(200,79,69,0.35);
+}
+.lock-btn:active { transform: scale(.97); background: #a83d34; }
+.lock-error { color: var(--sakura); font-size: 13px; margin-top: 10px; min-height: 18px; text-align: center; }
 
-  .loc-status { font-size: 12px; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; min-height: 18px; }
-  .loc-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
-  .loc-dot.active { background: var(--green); }
-  .loc-dot.error { background: var(--red); }
+/* ════════════════════════════════════
+   JOURNAL SCREEN
+════════════════════════════════════ */
+.journal-screen {
+  background: var(--bg);
+  justify-content: flex-start;
+  padding: 0;
+  align-items: stretch;
+}
 
-  .save-btn { background: var(--ink); border: none; border-radius: 12px; padding: 16px 0; font-size: 17px; font-weight: 700; color: #fff; cursor: pointer; width: 100%; font-family: inherit; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-  .save-btn:active { transform: scale(.98); background: #333; }
-  .save-btn:disabled { background: var(--border); cursor: not-allowed; }
-  .save-feedback { text-align: center; font-size: 13px; color: var(--muted); margin-top: 12px; min-height: 18px; }
+/* Header — mini hero strip */
+.j-header {
+  position: relative; overflow: hidden;
+  min-height: 110px;
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 20px 16px;
+  background: var(--bg);
+}
+.j-header-img {
+  position: absolute; inset: 0;
+  background-image: url('japan_hero.jpg');
+  background-size: cover; background-position: center 35%;
+  z-index: 0;
+}
+.j-header-grad {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(to bottom,
+    rgba(26,18,40,0.3) 0%,
+    rgba(26,18,40,0.88) 70%,
+    #1a1228 100%);
+}
+.j-header-content { position: relative; z-index: 2; display: flex; align-items: flex-end; justify-content: space-between; }
+.j-header-left {}
+.j-header-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px; font-weight: 700; color: #fff;
+  display: flex; align-items: center; gap: 8px;
+}
+.j-header-kanji { font-size: 11px; color: var(--coral); opacity: .65; }
+.j-header-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.j-lock-out {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 12px;
+  font-size: 12px; color: var(--muted);
+  cursor: pointer; font-family: inherit;
+  transition: all .15s; white-space: nowrap;
+}
+.j-lock-out:hover { border-color: var(--coral); color: var(--sakura); }
 
-  /* ── SUCCESS ── */
-  .success-screen { background: linear-gradient(160deg, #0d3320 0%, #1a6b3a 100%); }
-  .success-icon { font-size: 72px; margin-bottom: 16px; }
-  .success-title { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 10px; text-align: center; }
-  .success-sub { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.6; margin-bottom: 28px; text-align: center; }
-  .success-preview { background: rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 18px; width: 100%; max-width: 340px; margin-bottom: 24px; }
-  .preview-mood { font-size: 22px; margin-bottom: 6px; }
-  .preview-loc { font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
-  .preview-text { font-size: 14px; color: rgba(255,255,255,0.9); line-height: 1.6; font-style: italic; }
-  .new-entry-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 13px 28px; font-size: 15px; color: #fff; cursor: pointer; font-family: inherit; }
+/* Body */
+.j-body { width: 100%; padding: 18px 20px 60px; flex: 1; overflow-y: auto; }
 
-  /* RECENT ENTRIES */
-  .recent-label { font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin: 24px 0 12px; }
-  .entry-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
-  .entry-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 8px; }
-  .entry-mood-loc { display: flex; align-items: center; gap: 8px; }
-  .entry-mood-emoji { font-size: 18px; }
-  .entry-location { font-size: 12px; font-weight: 600; color: var(--ink); }
-  .entry-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
-  .entry-text { font-size: 14px; color: var(--muted); line-height: 1.55; font-style: italic; }
-  .entry-delete { background: none; border: none; color: #ddd; cursor: pointer; font-size: 14px; padding: 2px 4px; flex-shrink: 0; }
-  .entry-delete:active { color: var(--red); }
+/* Section headers */
+.section-eyebrow {
+  font-size: 9.5px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 10px; margin-top: 20px;
+}
+.section-eyebrow:first-child { margin-top: 0; }
+
+/* Mood chips */
+.mood-row { display: flex; gap: 7px; margin-bottom: 18px; flex-wrap: wrap; }
+.mood-chip {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 20px; padding: 7px 13px;
+  font-size: 13px; cursor: pointer;
+  transition: all .15s; display: flex;
+  align-items: center; gap: 6px;
+  font-family: inherit; white-space: nowrap;
+  color: var(--muted);
+}
+.mood-chip:active { transform: scale(.96); }
+.mood-chip.selected {
+  border-color: var(--coral);
+  background: rgba(200,79,69,0.2);
+  color: var(--sakura);
+}
+.mood-chip .mood-e { font-size: 16px; }
+
+/* Form fields */
+.field-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 7px; display: block;
+}
+.field-input {
+  width: 100%; border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px;
+  font-size: 15px; font-family: inherit; color: #fff;
+  background: rgba(255,255,255,0.06);
+  transition: border-color .15s; margin-bottom: 14px;
+}
+.field-input:focus { outline: none; border-color: var(--sakura); }
+.field-input::placeholder { color: var(--subtle); }
+.field-textarea {
+  width: 100%; border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px;
+  font-size: 15px; font-family: inherit; color: #fff;
+  background: rgba(255,255,255,0.06);
+  resize: none; min-height: 150px;
+  transition: border-color .15s; margin-bottom: 14px;
+  line-height: 1.65;
+}
+.field-textarea:focus { outline: none; border-color: var(--sakura); }
+.field-textarea::placeholder { color: var(--subtle); }
+
+/* Location row */
+.loc-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.loc-row .field-input { margin-bottom: 0; flex: 1; }
+.loc-detect-btn {
+  background: rgba(200,79,69,0.2);
+  border: 1px solid rgba(200,79,69,0.35);
+  border-radius: 10px; padding: 12px 14px;
+  font-size: 13px; color: var(--sakura);
+  cursor: pointer; white-space: nowrap;
+  font-family: inherit; flex-shrink: 0;
+  transition: all .15s;
+}
+.loc-detect-btn:active { background: rgba(200,79,69,0.35); }
+
+.loc-status {
+  font-size: 12px; color: var(--muted);
+  margin-bottom: 14px; display: flex;
+  align-items: center; gap: 6px; min-height: 18px;
+}
+.loc-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.15); flex-shrink: 0; }
+.loc-dot.active { background: #6dd9a0; }
+.loc-dot.error  { background: var(--coral); }
+.loc-dot.pinned { background: var(--coral); animation: pin-pulse 1.2s ease-out; }
+@keyframes pin-pulse { 0%{box-shadow:0 0 0 0 rgba(200,79,69,.6)} 70%{box-shadow:0 0 0 8px rgba(200,79,69,0)} 100%{box-shadow:none} }
+
+/* Save button */
+.save-btn {
+  background: var(--coral); border: none;
+  border-radius: 12px; padding: 16px 0;
+  font-size: 16px; font-weight: 700; color: #fff;
+  cursor: pointer; width: 100%; font-family: inherit;
+  transition: all .18s; display: flex;
+  align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 4px 20px rgba(200,79,69,0.3);
+}
+.save-btn:active { transform: scale(.98); background: #a83d34; }
+.save-btn:disabled { background: rgba(255,255,255,.1); box-shadow: none; cursor: not-allowed; color: var(--subtle); }
+.save-feedback { text-align: center; font-size: 13px; color: var(--muted); margin-top: 10px; min-height: 18px; }
+
+/* Pin drop toast */
+.pin-toast {
+  display: none; align-items: center; gap: 8px;
+  background: rgba(200,79,69,0.18);
+  border: 1px solid rgba(200,79,69,0.3);
+  border-radius: 8px; padding: 9px 14px;
+  font-size: 12.5px; color: var(--sakura);
+  margin-top: 10px;
+}
+.pin-toast.show { display: flex; }
+
+/* Recent entries */
+.recent-label {
+  font-size: 9.5px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted);
+  margin: 24px 0 12px;
+}
+.entry-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+  transition: border-color .15s;
+}
+.entry-card:hover { border-color: rgba(231,163,168,.25); }
+.entry-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 8px; }
+.entry-mood-loc { display: flex; align-items: center; gap: 8px; }
+.entry-mood-emoji { font-size: 18px; }
+.entry-location { font-size: 12px; font-weight: 600; color: var(--sakura); }
+.entry-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.entry-text { font-size: 13.5px; color: rgba(255,255,255,0.6); line-height: 1.55; font-style: italic; }
+.entry-delete { background: none; border: none; color: rgba(255,255,255,.15); cursor: pointer; font-size: 14px; padding: 2px 4px; flex-shrink: 0; transition: color .15s; }
+.entry-delete:hover { color: var(--coral); }
+.entry-pin-badge { font-size: 10px; color: var(--coral); margin-left: 4px; }
+
+/* ════════════════════════════════════
+   SUCCESS SCREEN
+════════════════════════════════════ */
+.success-screen {
+  position: relative; overflow: hidden;
+  background: var(--bg); padding: 40px 28px;
+}
+.success-bg { position: absolute; inset: 0; background-image: url('japan_hero.jpg'); background-size: cover; background-position: center 30%; z-index: 0; opacity: 0.25; }
+.success-bg-grad { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, rgba(26,18,40,0.4), rgba(26,18,40,0.9) 60%, #1a1228); }
+.success-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 340px; }
+.success-icon { font-size: 64px; margin-bottom: 14px; }
+.success-title { font-family: 'Noto Serif JP', serif; font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 8px; text-align: center; }
+.success-sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; text-align: center; }
+.success-preview {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px 18px;
+  width: 100%; margin-bottom: 22px;
+}
+.preview-mood { font-size: 22px; margin-bottom: 6px; }
+.preview-loc { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.preview-text { font-size: 14px; color: rgba(255,255,255,.85); line-height: 1.6; font-style: italic; }
+.preview-pin {
+  font-size: 12px; color: var(--coral);
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 5px;
+}
+.new-entry-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 13px 28px;
+  font-size: 15px; color: #fff; cursor: pointer;
+  font-family: inherit; transition: all .15s;
+}
+.new-entry-btn:hover { background: rgba(231,163,168,.15); border-color: var(--border-strong); }
 </style>
 </head>
 <body>
 
-<!-- ── LOCK SCREEN ── -->
+<!-- ════════════════════════════════════
+     LOCK SCREEN
+════════════════════════════════════ -->
 <div class="screen lock-screen active" id="screenLock">
-  <div class="lock-bg-text">日記</div>
-  <div class="lock-icon">📓</div>
-  <div class="lock-title">Owen's Journal</div>
-  <div class="lock-sub">Your private travel diary.<br>Family can read — only you can write.</div>
-  <input type="password" id="lockInput" class="lock-input" placeholder="••••••" maxlength="20"
-    onkeydown="if(event.key==='Enter')checkLock()">
-  <button class="lock-btn" onclick="checkLock()">Open Journal</button>
-  <div class="lock-error" id="lockError"></div>
+  <div class="lock-hero"></div>
+  <div class="lock-hero-grad"></div>
+  <div class="lock-content">
+    <div class="lock-kanji">日記</div>
+    <div class="lock-icon">📓</div>
+    <div class="lock-title">Owen's Journal</div>
+    <div class="lock-sub">Your private travel diary.<br>Family can read — only you can write.</div>
+    <input type="password" id="lockInput" class="lock-input"
+      placeholder="enter password" maxlength="20"
+      onkeydown="if(event.key==='Enter')checkLock()">
+    <button class="lock-btn" onclick="checkLock()">Open Journal</button>
+    <div class="lock-error" id="lockError"></div>
+  </div>
 </div>
 
-<!-- ── JOURNAL ENTRY SCREEN ── -->
+<!-- ════════════════════════════════════
+     JOURNAL SCREEN
+════════════════════════════════════ -->
 <div class="screen journal-screen" id="screenJournal">
+
+  <!-- Mini hero header -->
   <div class="j-header">
-    <div class="j-header-title">📓 Owen's Journal</div>
-    <div class="j-header-sub" id="jHeaderDate"></div>
-    <button class="j-lock-out" onclick="lockOut()">🔒 Lock</button>
+    <div class="j-header-img"></div>
+    <div class="j-header-grad"></div>
+    <div class="j-header-content">
+      <div class="j-header-left">
+        <div class="j-header-title">
+          📓 Owen's Journal <span class="j-header-kanji">日記</span>
+        </div>
+        <div class="j-header-sub" id="jHeaderDate"></div>
+      </div>
+      <button class="j-lock-out" onclick="lockOut()">🔒 Lock</button>
+    </div>
   </div>
 
   <div class="j-body">
 
     <!-- MOOD -->
-    <div class="mood-label">How was it?</div>
-    <div class="mood-row" id="moodRow">
-      <button class="mood-chip" data-mood="🌟 Amazing"   onclick="selectMood(this)"><span class="mood-e">🌟</span> Amazing</button>
-      <button class="mood-chip" data-mood="😊 Good day"  onclick="selectMood(this)"><span class="mood-e">😊</span> Good day</button>
-      <button class="mood-chip" data-mood="😤 Tough day" onclick="selectMood(this)"><span class="mood-e">😤</span> Tough day</button>
+    <div class="section-eyebrow">How was it?</div>
+    <div class="mood-row">
+      <button class="mood-chip" data-mood="🌟 Amazing"    onclick="selectMood(this)"><span class="mood-e">🌟</span> Amazing</button>
+      <button class="mood-chip" data-mood="😊 Good day"   onclick="selectMood(this)"><span class="mood-e">😊</span> Good day</button>
+      <button class="mood-chip" data-mood="😤 Tough day"  onclick="selectMood(this)"><span class="mood-e">😤</span> Tough day</button>
       <button class="mood-chip" data-mood="🍜 Food moment" onclick="selectMood(this)"><span class="mood-e">🍜</span> Food</button>
-      <button class="mood-chip" data-mood="🗺 Explored"  onclick="selectMood(this)"><span class="mood-e">🗺</span> Explored</button>
+      <button class="mood-chip" data-mood="🗺 Explored"   onclick="selectMood(this)"><span class="mood-e">🗺</span> Explored</button>
       <button class="mood-chip" data-mood="🏫 Class day"  onclick="selectMood(this)"><span class="mood-e">🏫</span> Class</button>
       <button class="mood-chip" data-mood="🌧 Rainy day"  onclick="selectMood(this)"><span class="mood-e">🌧</span> Rainy</button>
       <button class="mood-chip" data-mood="🎌 Cultural"   onclick="selectMood(this)"><span class="mood-e">🎌</span> Cultural</button>
@@ -136,10 +388,14 @@
     <!-- LOCATION -->
     <label class="field-label">Where are you?</label>
     <div class="loc-row">
-      <input class="field-input" id="jLoc" type="text" placeholder="e.g. Beppu, Kyoto, Hiroshima…">
+      <input class="field-input" id="jLoc" type="text"
+        placeholder="e.g. Beppu, Kyoto, Hiroshima…">
       <button class="loc-detect-btn" onclick="detectLocation()">📍 Detect</button>
     </div>
-    <div class="loc-status"><div class="loc-dot" id="locDot"></div><span id="locLabel">Tap Detect to find your location</span></div>
+    <div class="loc-status">
+      <div class="loc-dot" id="locDot"></div>
+      <span id="locLabel">Tap Detect to use your GPS location</span>
+    </div>
 
     <!-- ENTRY -->
     <label class="field-label">What happened today?</label>
@@ -151,35 +407,69 @@
       <span>✍️</span><span>Save to Journal</span>
     </button>
     <div class="save-feedback" id="saveFeedback"></div>
+    <div class="pin-toast" id="pinToast">
+      <span>📍</span><span id="pinToastMsg">Map pin dropped on the family guide!</span>
+    </div>
 
     <!-- RECENT -->
     <div class="recent-label">Recent Entries</div>
-    <div id="recentList"><div style="color:var(--muted);font-size:13px;text-align:center;padding:16px;">No entries yet</div></div>
+    <div id="recentList">
+      <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No entries yet — write your first one above!</div>
+    </div>
 
   </div>
 </div>
 
-<!-- ── SUCCESS SCREEN ── -->
+<!-- ════════════════════════════════════
+     SUCCESS SCREEN
+════════════════════════════════════ -->
 <div class="screen success-screen" id="screenSuccess">
-  <div class="success-icon">✅</div>
-  <div class="success-title">Entry Saved!</div>
-  <div class="success-sub">Your family can see it now<br>on the main guide.</div>
-  <div class="success-preview" id="successPreview"></div>
-  <button class="new-entry-btn" onclick="newEntry()">✍️ Write Another</button>
+  <div class="success-bg"></div>
+  <div class="success-bg-grad"></div>
+  <div class="success-content">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Entry Saved!</div>
+    <div class="success-sub">Your family can see it now<br>on the main guide.</div>
+    <div class="success-preview" id="successPreview"></div>
+    <button class="new-entry-btn" onclick="newEntry()">✍️ Write Another</button>
+  </div>
 </div>
 
 <script>
-const SUPABASE_URL = 'https://fmlolwkndaqpxvfszswx.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtbG9sd2tuZGFxcHh2ZnN6c3d4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDMzMTksImV4cCI6MjA5MzQ3OTMxOX0.mDg9MlJ83KP2lzsi_7jvPN1tLmRvupBtZcS0Sj8ITXo';
+const SUPABASE_URL  = 'https://fmlolwkndaqpxvfszswx.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtbG9sd2tuZGFxcHh2ZnN6c3d4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDMzMTksImV4cCI6MjA5MzQ3OTMxOX0.mDg9MlJ83KP2lzsi_7jvPN1tLmRvupBtZcS0Sj8ITXo';
 const JOURNAL_PASSWORD = 'beppu2026';
-const SESSION_KEY = 'journal_unlocked';
+const SESSION_KEY      = 'journal_unlocked';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let selectedMood = '';
+let selectedMood   = '';
 let detectedCoords = null;
+let droppedPinId   = null;
 
-// ── LOCK ──────────────────────────────────────────────────
+// City → map_visited location id mapping (matches main site)
+const CITY_MAP = {
+  'beppu':     'beppu',   'oita':      'beppu',
+  'fukuoka':   'fukuoka', 'hakata':    'fukuoka',
+  'hiroshima': 'hiroshima','miyajima':  'miyajima',
+  'kyoto':     'kyoto',   'nara':      'kyoto',
+  'osaka':     'osaka',   'kobe':      'osaka',
+  'tokyo':     'tokyo',   'shinjuku':  'tokyo',
+  'shibuya':   'tokyo',   'asakusa':   'tokyo',
+  'akihabara': 'tokyo',   'haneda':    'tokyo',
+  'yokohama':  'tokyo',
+};
+
+function resolvePin(locationStr) {
+  if (!locationStr) return null;
+  const lower = locationStr.toLowerCase();
+  for (const [kw, id] of Object.entries(CITY_MAP)) {
+    if (lower.includes(kw)) return id;
+  }
+  return null;
+}
+
+// ── LOCK ──
 function checkLock() {
   const val = document.getElementById('lockInput').value;
   const err = document.getElementById('lockError');
@@ -202,17 +492,17 @@ function lockOut() {
   showScreen('screenLock');
 }
 
-// ── MOOD ──────────────────────────────────────────────────
+// ── MOOD ──
 function selectMood(btn) {
   document.querySelectorAll('.mood-chip').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   selectedMood = btn.dataset.mood;
 }
 
-// ── LOCATION ─────────────────────────────────────────────
+// ── LOCATION DETECT ──
 async function detectLocation() {
-  const dot = document.getElementById('locDot');
-  const lbl = document.getElementById('locLabel');
+  const dot   = document.getElementById('locDot');
+  const lbl   = document.getElementById('locLabel');
   const input = document.getElementById('jLoc');
   dot.className = 'loc-dot';
   lbl.textContent = 'Detecting…';
@@ -224,7 +514,7 @@ async function detectLocation() {
   navigator.geolocation.getCurrentPosition(async pos => {
     detectedCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
     try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${detectedCoords.lat}&lon=${detectedCoords.lng}&format=json`);
+      const res  = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${detectedCoords.lat}&lon=${detectedCoords.lng}&format=json`);
       const data = await res.json();
       const parts = (data.display_name || '').split(',');
       const place = parts.slice(0, 2).join(',').trim();
@@ -242,26 +532,57 @@ async function detectLocation() {
   }, { enableHighAccuracy: true, timeout: 10000 });
 }
 
-// ── SAVE ──────────────────────────────────────────────────
-async function saveEntry() {
-  const text = document.getElementById('jText').value.trim();
-  const loc = document.getElementById('jLoc').value.trim();
-  const feedback = document.getElementById('saveFeedback');
-  const saveBtn = document.getElementById('saveBtn');
+// ── DROP MAP PIN ──
+async function dropMapPin(locationStr) {
+  const locId = resolvePin(locationStr);
+  droppedPinId = locId;
+  if (!locId) return;
+  try {
+    await sb.from('map_visited').upsert(
+      { location: locId, visited: true, updated_at: new Date().toISOString() },
+      { onConflict: 'location' }
+    );
+    // Update loc dot
+    const dot = document.getElementById('locDot');
+    const lbl = document.getElementById('locLabel');
+    dot.className = 'loc-dot pinned';
+    // Show pin toast
+    const toast = document.getElementById('pinToast');
+    const names = {
+      beppu:'Beppu (APU)', fukuoka:'Fukuoka', hiroshima:'Hiroshima',
+      miyajima:'Miyajima Island', kyoto:'Kyoto', osaka:'Osaka', tokyo:'Tokyo'
+    };
+    document.getElementById('pinToastMsg').textContent =
+      `📍 Map pin dropped for ${names[locId] || locId} on the family guide!`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  } catch(e) {
+    console.error('Pin drop error:', e?.message || JSON.stringify(e));
+  }
+}
 
+// ── SAVE ──
+async function saveEntry() {
+  const text     = document.getElementById('jText').value.trim();
+  const loc      = document.getElementById('jLoc').value.trim();
+  const feedback = document.getElementById('saveFeedback');
+  const saveBtn  = document.getElementById('saveBtn');
   if (!text) { feedback.textContent = 'Write something first!'; return; }
 
   saveBtn.disabled = true;
   feedback.textContent = 'Saving…';
 
-  const now = new Date();
-  const jpTime = now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const now    = new Date();
+  const jpTime = now.toLocaleString('en-US', {
+    timeZone:'Asia/Tokyo', month:'short', day:'numeric',
+    hour:'2-digit', minute:'2-digit'
+  });
 
   const entry = {
     id: Date.now().toString(),
     name: 'Owen',
     location: loc || 'Japan',
-    text: text,
+    text,
     mood: selectedMood || '📓 Entry',
     japan_time: jpTime,
     created_at: now.toISOString()
@@ -271,11 +592,20 @@ async function saveEntry() {
     const { error } = await sb.from('journal').insert(entry);
     if (error) throw error;
 
-    // Show success screen
+    // Drop map pin
+    const locId   = resolvePin(loc);
+    const pinNames = {
+      beppu:'Beppu (APU)', fukuoka:'Fukuoka', hiroshima:'Hiroshima',
+      miyajima:'Miyajima Island', kyoto:'Kyoto', osaka:'Osaka', tokyo:'Tokyo'
+    };
+    if (locId) await dropMapPin(loc);
+
+    // Build success preview
     document.getElementById('successPreview').innerHTML = `
       <div class="preview-mood">${(selectedMood || '📓').split(' ')[0]}</div>
       ${loc ? `<div class="preview-loc">📍 ${loc} · ${jpTime}</div>` : `<div class="preview-loc">${jpTime}</div>`}
-      <div class="preview-text">"${text.length > 120 ? text.substring(0, 120) + '…' : text}"</div>
+      <div class="preview-text">"${text.length > 120 ? text.substring(0,120)+'…' : text}"</div>
+      ${locId ? `<div class="preview-pin">📍 Map pin dropped for ${pinNames[locId] || locId}</div>` : ''}
     `;
     showScreen('screenSuccess');
   } catch(e) {
@@ -285,45 +615,49 @@ async function saveEntry() {
   }
 }
 
-// ── NEW ENTRY ─────────────────────────────────────────────
+// ── NEW ENTRY ──
 function newEntry() {
-  document.getElementById('jText').value = '';
-  document.getElementById('jLoc').value = '';
+  document.getElementById('jText').value        = '';
+  document.getElementById('jLoc').value         = '';
   document.getElementById('saveFeedback').textContent = '';
-  document.getElementById('saveBtn').disabled = false;
-  document.getElementById('locDot').className = 'loc-dot';
-  document.getElementById('locLabel').textContent = 'Tap Detect to find your location';
+  document.getElementById('saveBtn').disabled   = false;
+  document.getElementById('locDot').className   = 'loc-dot';
+  document.getElementById('locLabel').textContent = 'Tap Detect to use your GPS location';
+  document.getElementById('pinToast').classList.remove('show');
   document.querySelectorAll('.mood-chip').forEach(b => b.classList.remove('selected'));
-  selectedMood = '';
-  detectedCoords = null;
+  selectedMood = ''; detectedCoords = null; droppedPinId = null;
   showScreen('screenJournal');
   loadRecent();
 }
 
-// ── LOAD RECENT ───────────────────────────────────────────
+// ── LOAD RECENT ──
 async function loadRecent() {
   try {
-    const { data } = await sb.from('journal').select('*').order('created_at', { ascending: false }).limit(5);
+    const { data } = await sb.from('journal').select('*')
+      .order('created_at', { ascending: false }).limit(6);
     const list = document.getElementById('recentList');
-    if (!data || data.length === 0) {
-      list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:16px;">No entries yet — write your first one above!</div>';
+    if (!data || !data.length) {
+      list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No entries yet — write your first one above!</div>';
       return;
     }
-    list.innerHTML = data.map(e => `
+    list.innerHTML = data.map(e => {
+      const pinId  = resolvePin(e.location);
+      const pinBadge = pinId ? '<span class="entry-pin-badge">📍</span>' : '';
+      return `
       <div class="entry-card">
         <div class="entry-header">
           <div class="entry-mood-loc">
             <span class="entry-mood-emoji">${(e.mood || '📓').split(' ')[0]}</span>
-            <span class="entry-location">${e.location || 'Japan'}</span>
+            <span class="entry-location">${e.location || 'Japan'}${pinBadge}</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div class="entry-date">${e.japan_time || new Date(e.created_at).toLocaleDateString()}</div>
             <button class="entry-delete" onclick="deleteEntry('${e.id}')">✕</button>
           </div>
         </div>
-        <div class="entry-text">${e.text.length > 150 ? e.text.substring(0, 150) + '…' : e.text}</div>
-      </div>
-    `).join('');
+        <div class="entry-text">${e.text.length > 150 ? e.text.substring(0,150)+'…' : e.text}</div>
+      </div>`;
+    }).join('');
   } catch(e) { console.error(e); }
 }
 
@@ -335,7 +669,7 @@ async function deleteEntry(id) {
   } catch(e) { console.error(e); }
 }
 
-// ── UTILS ─────────────────────────────────────────────────
+// ── UTILS ──
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -345,17 +679,17 @@ function updateHeaderDate() {
   const el = document.getElementById('jHeaderDate');
   if (!el) return;
   const now = new Date();
-  el.textContent = now.toLocaleDateString('en-US', { timeZone: 'Asia/Tokyo', weekday: 'long', month: 'long', day: 'numeric' }) + ' · Japan Time';
+  el.textContent = now.toLocaleDateString('en-US', {
+    timeZone:'Asia/Tokyo', weekday:'long', month:'long', day:'numeric'
+  }) + ' · Japan Time';
 }
 
-// ── INIT ──────────────────────────────────────────────────
+// ── INIT ──
 if (sessionStorage.getItem(SESSION_KEY) === '1') {
   showScreen('screenJournal');
   loadRecent();
   updateHeaderDate();
 }
-
-// Allow Enter key on lock screen
 document.getElementById('lockInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') checkLock();
 });
