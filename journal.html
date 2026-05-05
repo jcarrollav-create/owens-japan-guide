@@ -4,695 +4,349 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Owen's Journal">
 <title>Owen's Journal 日記</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ── RESET ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
 :root {
-  --bg:           #1a1228;
-  --bg2:          #261838;
-  --bg3:          #321f47;
-  --coral:        #c84f45;
-  --sakura:       #e7a3a8;
-  --gold:         #f9c74f;
-  --green:        #1f7a4d;
-  --border:       rgba(231,163,168,0.15);
-  --border-strong:rgba(231,163,168,0.28);
-  --muted:        rgba(231,163,168,0.55);
-  --subtle:       rgba(255,255,255,0.3);
+  --ivory:   #f5f0e8; --washi:  #ede5d5; --washi2: #e3d9c4;
+  --beni:    #9b2335; --sumi:   #2c1810; --chestnut:#6b4226;
+  --muted:   #8b5e3c; --subtle: #a07850;
+  --pine:    #2e5b3a; --indigo: #2e4a7a; --gold:   #b8860b;
+  --border:  rgba(44,24,16,0.14); --border-s: rgba(44,24,16,0.26);
 }
+html, body { height:100%; font-family:'DM Sans',-apple-system,sans-serif; background:var(--ivory); color:var(--sumi); overscroll-behavior:none; }
 
-html, body {
-  height: 100%;
-  font-family: 'DM Sans', -apple-system, sans-serif;
-  background: var(--bg);
-  color: #fff;
-  overscroll-behavior: none;
-}
+.screen { display:none; min-height:100vh; flex-direction:column; align-items:center; justify-content:center; }
+.screen.active { display:flex; }
 
-/* ── SCREENS ── */
-.screen { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; }
-.screen.active { display: flex; }
+/* ── LOCK ── */
+.lock-screen { position:relative; overflow:hidden; background:var(--sumi); padding:40px 28px; }
+.lock-bg { position:absolute; inset:0; background-image:url('japan_hero.jpg'); background-size:cover; background-position:center 30%; z-index:0; }
+.lock-grad { position:absolute; inset:0; z-index:1; background:linear-gradient(to bottom, rgba(44,24,16,.4) 0%, rgba(44,24,16,.82) 55%, #2c1810 100%); }
+.lock-content { position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; width:100%; max-width:340px; }
+.lock-kanji { font-family:'Noto Serif JP',serif; font-size:56px; opacity:.1; position:absolute; top:-65px; right:-8px; pointer-events:none; color:var(--washi); line-height:1; }
+.lock-icon { font-size:46px; margin-bottom:14px; }
+.lock-title { font-family:'Noto Serif JP',serif; font-size:28px; font-weight:700; color:#fff; margin-bottom:6px; text-align:center; }
+.lock-sub { font-size:13.5px; color:rgba(237,229,213,.65); margin-bottom:32px; text-align:center; line-height:1.6; }
+.lock-input { background:rgba(255,255,255,.1); border:1px solid rgba(237,229,213,.3); border-radius:12px; padding:14px 18px; font-size:20px; color:#fff; width:100%; text-align:center; letter-spacing:.25em; font-family:inherit; margin-bottom:12px; transition:border-color .15s; }
+.lock-input:focus { outline:none; border-color:rgba(237,229,213,.65); }
+.lock-input::placeholder { color:rgba(237,229,213,.3); letter-spacing:.1em; font-size:14px; }
+.lock-btn { background:var(--beni); border:none; border-radius:12px; padding:14px 0; font-size:16px; font-weight:700; color:#fff; cursor:pointer; width:100%; font-family:inherit; transition:all .18s; box-shadow:0 4px 18px rgba(155,35,53,.4); }
+.lock-btn:active { transform:scale(.97); }
+.lock-error { color:#f9c090; font-size:13px; margin-top:10px; min-height:18px; text-align:center; }
+.lock-disclaimer { font-size:10.5px; color:rgba(237,229,213,.38); margin-top:18px; text-align:center; line-height:1.5; max-width:280px; }
 
-/* ════════════════════════════════════
-   LOCK SCREEN
-════════════════════════════════════ */
-.lock-screen {
-  position: relative; overflow: hidden;
-  background: var(--bg);
-  padding: 40px 28px;
-}
+/* ── JOURNAL SCREEN ── */
+.journal-screen { background:var(--ivory); justify-content:flex-start; align-items:stretch; padding:0; }
+.j-header { position:relative; overflow:hidden; min-height:110px; display:flex; flex-direction:column; justify-content:flex-end; padding:0 20px 16px; }
+.j-header-bg { position:absolute; inset:0; background-image:url('japan_hero.jpg'); background-size:cover; background-position:center 35%; z-index:0; }
+.j-header-grad { position:absolute; inset:0; z-index:1; background:linear-gradient(to bottom, rgba(44,24,16,.25) 0%, rgba(44,24,16,.88) 70%, #f5f0e8 100%); }
+.j-header-row { position:relative; z-index:2; display:flex; align-items:flex-end; justify-content:space-between; }
+.j-title { font-family:'Noto Serif JP',serif; font-size:20px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; }
+.j-title-kanji { font-size:11px; color:rgba(237,229,213,.6); }
+.j-date { font-size:11px; color:rgba(237,229,213,.55); margin-top:3px; }
+.j-lock-btn { background:rgba(255,255,255,.12); border:1px solid rgba(237,229,213,.2); border-radius:8px; padding:6px 12px; font-size:12px; color:rgba(237,229,213,.75); cursor:pointer; font-family:inherit; transition:all .15s; white-space:nowrap; }
+.j-lock-btn:hover { background:rgba(155,35,53,.25); border-color:rgba(155,35,53,.4); color:#fff; }
 
-/* Hero image on lock screen */
-.lock-hero {
-  position: absolute; inset: 0;
-  background-image: url('japan_hero.jpg');
-  background-size: cover;
-  background-position: center 30%;
-  z-index: 0;
-}
-.lock-hero-grad {
-  position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(to bottom,
-    rgba(26,18,40,0.55) 0%,
-    rgba(26,18,40,0.82) 55%,
-    #1a1228 100%);
-}
+/* body */
+.j-body { width:100%; padding:18px 20px 70px; flex:1; overflow-y:auto; }
+.section-lbl { font-size:9.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; margin-top:18px; }
+.section-lbl:first-child { margin-top:0; }
 
-.lock-content {
-  position: relative; z-index: 2;
-  display: flex; flex-direction: column;
-  align-items: center; width: 100%; max-width: 340px;
-}
+/* mood */
+.mood-row { display:flex; gap:7px; margin-bottom:18px; flex-wrap:wrap; }
+.mood-chip { background:#fff; border:1.5px solid var(--border-s); border-radius:20px; padding:7px 13px; font-size:13px; cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:6px; font-family:inherit; white-space:nowrap; color:var(--chestnut); }
+.mood-chip:active { transform:scale(.96); }
+.mood-chip.selected { border-color:var(--beni); background:rgba(155,35,53,.08); color:var(--beni); }
+.mood-chip .me { font-size:16px; }
 
-.lock-kanji {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 52px; opacity: 0.12;
-  position: absolute; top: -60px; right: -10px;
-  pointer-events: none; color: var(--sakura);
-  line-height: 1;
-}
-.lock-icon { font-size: 46px; margin-bottom: 14px; }
-.lock-title {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 28px; font-weight: 700; color: #fff;
-  margin-bottom: 6px; text-align: center;
-}
-.lock-sub {
-  font-size: 13.5px; color: var(--muted);
-  margin-bottom: 32px; text-align: center; line-height: 1.6;
-}
-.lock-input {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid var(--border-strong);
-  border-radius: 12px; padding: 14px 18px;
-  font-size: 20px; color: #fff; width: 100%;
-  text-align: center; letter-spacing: .25em;
-  font-family: inherit; margin-bottom: 12px;
-  transition: border-color .15s;
-}
-.lock-input:focus { outline: none; border-color: var(--sakura); }
-.lock-input::placeholder { color: var(--subtle); letter-spacing: .1em; font-size: 14px; }
-.lock-btn {
-  background: var(--coral); border: none;
-  border-radius: 12px; padding: 14px 0;
-  font-size: 16px; font-weight: 700; color: #fff;
-  cursor: pointer; width: 100%; font-family: inherit;
-  transition: all .18s; box-shadow: 0 4px 20px rgba(200,79,69,0.35);
-}
-.lock-btn:active { transform: scale(.97); background: #a83d34; }
-.lock-error { color: var(--sakura); font-size: 13px; margin-top: 10px; min-height: 18px; text-align: center; }
+/* form */
+.field-lbl { font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:7px; display:block; }
+.field-inp { width:100%; border:1.5px solid var(--border-s); border-radius:10px; padding:12px 14px; font-size:15px; font-family:inherit; color:var(--sumi); background:#fff; transition:border-color .15s; margin-bottom:14px; }
+.field-inp:focus { outline:none; border-color:var(--beni); }
+.field-inp::placeholder { color:var(--subtle); }
+.field-ta { width:100%; border:1.5px solid var(--border-s); border-radius:10px; padding:12px 14px; font-size:15px; font-family:inherit; color:var(--sumi); background:#fff; resize:none; min-height:150px; transition:border-color .15s; margin-bottom:14px; line-height:1.65; }
+.field-ta:focus { outline:none; border-color:var(--beni); }
+.field-ta::placeholder { color:var(--subtle); }
 
-/* ════════════════════════════════════
-   JOURNAL SCREEN
-════════════════════════════════════ */
-.journal-screen {
-  background: var(--bg);
-  justify-content: flex-start;
-  padding: 0;
-  align-items: stretch;
-}
+/* location */
+.loc-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.loc-row .field-inp { margin-bottom:0; flex:1; }
+.loc-btn { background:var(--washi); border:1.5px solid var(--border-s); border-radius:10px; padding:12px 14px; font-size:13px; color:var(--chestnut); cursor:pointer; white-space:nowrap; font-family:inherit; flex-shrink:0; transition:all .15s; }
+.loc-btn:hover { background:rgba(155,35,53,.08); border-color:rgba(155,35,53,.3); color:var(--beni); }
+.loc-status { font-size:12px; color:var(--muted); margin-bottom:14px; display:flex; align-items:center; gap:6px; min-height:18px; }
+.loc-dot { width:7px; height:7px; border-radius:50%; background:rgba(44,24,16,.15); flex-shrink:0; }
+.loc-dot.ok  { background:var(--pine); }
+.loc-dot.err { background:var(--beni); }
+.loc-dot.pin { background:var(--beni); animation:pinpulse 1.2s ease-out; }
+@keyframes pinpulse { 0%{box-shadow:0 0 0 0 rgba(155,35,53,.5)} 70%{box-shadow:0 0 0 8px rgba(155,35,53,0)} 100%{box-shadow:none} }
 
-/* Header — mini hero strip */
-.j-header {
-  position: relative; overflow: hidden;
-  min-height: 110px;
-  display: flex; flex-direction: column;
-  justify-content: flex-end;
-  padding: 0 20px 16px;
-  background: var(--bg);
-}
-.j-header-img {
-  position: absolute; inset: 0;
-  background-image: url('japan_hero.jpg');
-  background-size: cover; background-position: center 35%;
-  z-index: 0;
-}
-.j-header-grad {
-  position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(to bottom,
-    rgba(26,18,40,0.3) 0%,
-    rgba(26,18,40,0.88) 70%,
-    #1a1228 100%);
-}
-.j-header-content { position: relative; z-index: 2; display: flex; align-items: flex-end; justify-content: space-between; }
-.j-header-left {}
-.j-header-title {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 20px; font-weight: 700; color: #fff;
-  display: flex; align-items: center; gap: 8px;
-}
-.j-header-kanji { font-size: 11px; color: var(--coral); opacity: .65; }
-.j-header-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
-.j-lock-out {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid var(--border);
-  border-radius: 8px; padding: 6px 12px;
-  font-size: 12px; color: var(--muted);
-  cursor: pointer; font-family: inherit;
-  transition: all .15s; white-space: nowrap;
-}
-.j-lock-out:hover { border-color: var(--coral); color: var(--sakura); }
+/* save */
+.save-btn { background:var(--beni); border:none; border-radius:12px; padding:16px 0; font-size:16px; font-weight:700; color:#fff; cursor:pointer; width:100%; font-family:inherit; transition:all .18s; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 4px 16px rgba(155,35,53,.28); }
+.save-btn:active { transform:scale(.98); background:#7e1c2a; }
+.save-btn:disabled { background:var(--washi); color:var(--subtle); box-shadow:none; cursor:not-allowed; }
+.save-fb { text-align:center; font-size:13px; color:var(--muted); margin-top:10px; min-height:18px; }
+.pin-toast { display:none; align-items:center; gap:8px; background:rgba(155,35,53,.08); border:1px solid rgba(155,35,53,.2); border-radius:8px; padding:9px 14px; font-size:12.5px; color:var(--beni); margin-top:10px; }
+.pin-toast.show { display:flex; }
 
-/* Body */
-.j-body { width: 100%; padding: 18px 20px 60px; flex: 1; overflow-y: auto; }
+/* recent */
+.recent-lbl { font-size:9.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:24px 0 12px; }
+.entry-card { background:#fff; border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:10px; box-shadow:0 1px 4px rgba(44,24,16,.05); transition:border-color .15s; }
+.entry-card:hover { border-color:rgba(155,35,53,.25); }
+.entry-hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; gap:8px; }
+.entry-ml { display:flex; align-items:center; gap:8px; }
+.entry-emoji { font-size:18px; }
+.entry-loc { font-size:12px; font-weight:600; color:var(--beni); }
+.entry-date { font-size:11px; color:var(--muted); white-space:nowrap; }
+.entry-text { font-size:13.5px; color:var(--chestnut); line-height:1.55; font-style:italic; }
+.entry-del { background:none; border:none; color:rgba(44,24,16,.18); cursor:pointer; font-size:14px; padding:2px 4px; transition:color .15s; font-family:'DM Sans',sans-serif; }
+.entry-del:hover { color:var(--beni); }
+.entry-pin { font-size:10px; color:var(--beni); margin-left:3px; }
 
-/* Section headers */
-.section-eyebrow {
-  font-size: 9.5px; font-weight: 700; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--muted);
-  margin-bottom: 10px; margin-top: 20px;
-}
-.section-eyebrow:first-child { margin-top: 0; }
+/* success */
+.success-screen { position:relative; overflow:hidden; background:var(--sumi); padding:40px 28px; }
+.suc-bg { position:absolute; inset:0; background-image:url('japan_hero.jpg'); background-size:cover; background-position:center 30%; z-index:0; opacity:.25; }
+.suc-grad { position:absolute; inset:0; z-index:1; background:linear-gradient(to bottom,rgba(44,24,16,.35),rgba(44,24,16,.9) 60%,#2c1810); }
+.suc-content { position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; width:100%; max-width:340px; }
+.suc-icon { font-size:64px; margin-bottom:14px; }
+.suc-title { font-family:'Noto Serif JP',serif; font-size:26px; font-weight:700; color:#fff; margin-bottom:8px; text-align:center; }
+.suc-sub { font-size:14px; color:rgba(237,229,213,.6); line-height:1.6; margin-bottom:24px; text-align:center; }
+.suc-preview { background:rgba(255,255,255,.09); border:1px solid rgba(237,229,213,.18); border-radius:14px; padding:16px 18px; width:100%; margin-bottom:22px; }
+.suc-mood { font-size:22px; margin-bottom:6px; }
+.suc-loc { font-size:12px; color:rgba(237,229,213,.55); margin-bottom:8px; }
+.suc-text { font-size:14px; color:rgba(255,255,255,.88); line-height:1.6; font-style:italic; }
+.suc-pin { font-size:12px; color:#f9c090; margin-top:10px; padding-top:10px; border-top:1px solid rgba(237,229,213,.15); display:flex; align-items:center; gap:5px; }
+.new-btn { background:rgba(255,255,255,.1); border:1px solid rgba(237,229,213,.2); border-radius:12px; padding:13px 28px; font-size:15px; color:#fff; cursor:pointer; font-family:inherit; transition:all .15s; }
+.new-btn:hover { background:rgba(155,35,53,.25); }
 
-/* Mood chips */
-.mood-row { display: flex; gap: 7px; margin-bottom: 18px; flex-wrap: wrap; }
-.mood-chip {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border);
-  border-radius: 20px; padding: 7px 13px;
-  font-size: 13px; cursor: pointer;
-  transition: all .15s; display: flex;
-  align-items: center; gap: 6px;
-  font-family: inherit; white-space: nowrap;
-  color: var(--muted);
-}
-.mood-chip:active { transform: scale(.96); }
-.mood-chip.selected {
-  border-color: var(--coral);
-  background: rgba(200,79,69,0.2);
-  color: var(--sakura);
-}
-.mood-chip .mood-e { font-size: 16px; }
-
-/* Form fields */
-.field-label {
-  font-size: 11px; font-weight: 700; letter-spacing: .07em;
-  text-transform: uppercase; color: var(--muted);
-  margin-bottom: 7px; display: block;
-}
-.field-input {
-  width: 100%; border: 1px solid var(--border);
-  border-radius: 10px; padding: 12px 14px;
-  font-size: 15px; font-family: inherit; color: #fff;
-  background: rgba(255,255,255,0.06);
-  transition: border-color .15s; margin-bottom: 14px;
-}
-.field-input:focus { outline: none; border-color: var(--sakura); }
-.field-input::placeholder { color: var(--subtle); }
-.field-textarea {
-  width: 100%; border: 1px solid var(--border);
-  border-radius: 10px; padding: 12px 14px;
-  font-size: 15px; font-family: inherit; color: #fff;
-  background: rgba(255,255,255,0.06);
-  resize: none; min-height: 150px;
-  transition: border-color .15s; margin-bottom: 14px;
-  line-height: 1.65;
-}
-.field-textarea:focus { outline: none; border-color: var(--sakura); }
-.field-textarea::placeholder { color: var(--subtle); }
-
-/* Location row */
-.loc-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.loc-row .field-input { margin-bottom: 0; flex: 1; }
-.loc-detect-btn {
-  background: rgba(200,79,69,0.2);
-  border: 1px solid rgba(200,79,69,0.35);
-  border-radius: 10px; padding: 12px 14px;
-  font-size: 13px; color: var(--sakura);
-  cursor: pointer; white-space: nowrap;
-  font-family: inherit; flex-shrink: 0;
-  transition: all .15s;
-}
-.loc-detect-btn:active { background: rgba(200,79,69,0.35); }
-
-.loc-status {
-  font-size: 12px; color: var(--muted);
-  margin-bottom: 14px; display: flex;
-  align-items: center; gap: 6px; min-height: 18px;
-}
-.loc-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.15); flex-shrink: 0; }
-.loc-dot.active { background: #6dd9a0; }
-.loc-dot.error  { background: var(--coral); }
-.loc-dot.pinned { background: var(--coral); animation: pin-pulse 1.2s ease-out; }
-@keyframes pin-pulse { 0%{box-shadow:0 0 0 0 rgba(200,79,69,.6)} 70%{box-shadow:0 0 0 8px rgba(200,79,69,0)} 100%{box-shadow:none} }
-
-/* Save button */
-.save-btn {
-  background: var(--coral); border: none;
-  border-radius: 12px; padding: 16px 0;
-  font-size: 16px; font-weight: 700; color: #fff;
-  cursor: pointer; width: 100%; font-family: inherit;
-  transition: all .18s; display: flex;
-  align-items: center; justify-content: center; gap: 10px;
-  box-shadow: 0 4px 20px rgba(200,79,69,0.3);
-}
-.save-btn:active { transform: scale(.98); background: #a83d34; }
-.save-btn:disabled { background: rgba(255,255,255,.1); box-shadow: none; cursor: not-allowed; color: var(--subtle); }
-.save-feedback { text-align: center; font-size: 13px; color: var(--muted); margin-top: 10px; min-height: 18px; }
-
-/* Pin drop toast */
-.pin-toast {
-  display: none; align-items: center; gap: 8px;
-  background: rgba(200,79,69,0.18);
-  border: 1px solid rgba(200,79,69,0.3);
-  border-radius: 8px; padding: 9px 14px;
-  font-size: 12.5px; color: var(--sakura);
-  margin-top: 10px;
-}
-.pin-toast.show { display: flex; }
-
-/* Recent entries */
-.recent-label {
-  font-size: 9.5px; font-weight: 700; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--muted);
-  margin: 24px 0 12px;
-}
-.entry-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border);
-  border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
-  transition: border-color .15s;
-}
-.entry-card:hover { border-color: rgba(231,163,168,.25); }
-.entry-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 8px; }
-.entry-mood-loc { display: flex; align-items: center; gap: 8px; }
-.entry-mood-emoji { font-size: 18px; }
-.entry-location { font-size: 12px; font-weight: 600; color: var(--sakura); }
-.entry-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
-.entry-text { font-size: 13.5px; color: rgba(255,255,255,0.6); line-height: 1.55; font-style: italic; }
-.entry-delete { background: none; border: none; color: rgba(255,255,255,.15); cursor: pointer; font-size: 14px; padding: 2px 4px; flex-shrink: 0; transition: color .15s; }
-.entry-delete:hover { color: var(--coral); }
-.entry-pin-badge { font-size: 10px; color: var(--coral); margin-left: 4px; }
-
-/* ════════════════════════════════════
-   SUCCESS SCREEN
-════════════════════════════════════ */
-.success-screen {
-  position: relative; overflow: hidden;
-  background: var(--bg); padding: 40px 28px;
-}
-.success-bg { position: absolute; inset: 0; background-image: url('japan_hero.jpg'); background-size: cover; background-position: center 30%; z-index: 0; opacity: 0.25; }
-.success-bg-grad { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, rgba(26,18,40,0.4), rgba(26,18,40,0.9) 60%, #1a1228); }
-.success-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 340px; }
-.success-icon { font-size: 64px; margin-bottom: 14px; }
-.success-title { font-family: 'Noto Serif JP', serif; font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 8px; text-align: center; }
-.success-sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; text-align: center; }
-.success-preview {
-  background: rgba(255,255,255,0.07);
-  border: 1px solid var(--border);
-  border-radius: 14px; padding: 16px 18px;
-  width: 100%; margin-bottom: 22px;
-}
-.preview-mood { font-size: 22px; margin-bottom: 6px; }
-.preview-loc { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
-.preview-text { font-size: 14px; color: rgba(255,255,255,.85); line-height: 1.6; font-style: italic; }
-.preview-pin {
-  font-size: 12px; color: var(--coral);
-  margin-top: 10px; padding-top: 10px;
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center; gap: 5px;
-}
-.new-entry-btn {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid var(--border);
-  border-radius: 12px; padding: 13px 28px;
-  font-size: 15px; color: #fff; cursor: pointer;
-  font-family: inherit; transition: all .15s;
-}
-.new-entry-btn:hover { background: rgba(231,163,168,.15); border-color: var(--border-strong); }
+/* disclaimer bar */
+.j-disclaimer { background:var(--washi); border-top:1px solid var(--border); padding:9px 20px; text-align:center; font-size:11px; color:var(--muted); line-height:1.5; }
+.j-disclaimer strong { color:var(--beni); }
 </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════════
-     LOCK SCREEN
-════════════════════════════════════ -->
+<!-- ── LOCK ── -->
 <div class="screen lock-screen active" id="screenLock">
-  <div class="lock-hero"></div>
-  <div class="lock-hero-grad"></div>
+  <div class="lock-bg"></div>
+  <div class="lock-grad"></div>
   <div class="lock-content">
     <div class="lock-kanji">日記</div>
     <div class="lock-icon">📓</div>
     <div class="lock-title">Owen's Journal</div>
     <div class="lock-sub">Your private travel diary.<br>Family can read — only you can write.</div>
-    <input type="password" id="lockInput" class="lock-input"
-      placeholder="enter password" maxlength="20"
-      onkeydown="if(event.key==='Enter')checkLock()">
+    <input type="password" id="lockInput" class="lock-input" placeholder="enter password" maxlength="20">
     <button class="lock-btn" onclick="checkLock()">Open Journal</button>
     <div class="lock-error" id="lockError"></div>
+    <div class="lock-disclaimer">Public site — do not include passwords,<br>confirmation numbers, or private details.</div>
   </div>
 </div>
 
-<!-- ════════════════════════════════════
-     JOURNAL SCREEN
-════════════════════════════════════ -->
+<!-- ── JOURNAL ── -->
 <div class="screen journal-screen" id="screenJournal">
-
-  <!-- Mini hero header -->
   <div class="j-header">
-    <div class="j-header-img"></div>
+    <div class="j-header-bg"></div>
     <div class="j-header-grad"></div>
-    <div class="j-header-content">
-      <div class="j-header-left">
-        <div class="j-header-title">
-          📓 Owen's Journal <span class="j-header-kanji">日記</span>
-        </div>
-        <div class="j-header-sub" id="jHeaderDate"></div>
+    <div class="j-header-row">
+      <div>
+        <div class="j-title">📓 Owen's Journal <span class="j-title-kanji">日記</span></div>
+        <div class="j-date" id="jHeaderDate"></div>
       </div>
-      <button class="j-lock-out" onclick="lockOut()">🔒 Lock</button>
+      <button class="j-lock-btn" onclick="lockOut()">🔒 Lock</button>
     </div>
   </div>
 
   <div class="j-body">
-
-    <!-- MOOD -->
-    <div class="section-eyebrow">How was it?</div>
+    <div class="section-lbl">How was it?</div>
     <div class="mood-row">
-      <button class="mood-chip" data-mood="🌟 Amazing"    onclick="selectMood(this)"><span class="mood-e">🌟</span> Amazing</button>
-      <button class="mood-chip" data-mood="😊 Good day"   onclick="selectMood(this)"><span class="mood-e">😊</span> Good day</button>
-      <button class="mood-chip" data-mood="😤 Tough day"  onclick="selectMood(this)"><span class="mood-e">😤</span> Tough day</button>
-      <button class="mood-chip" data-mood="🍜 Food moment" onclick="selectMood(this)"><span class="mood-e">🍜</span> Food</button>
-      <button class="mood-chip" data-mood="🗺 Explored"   onclick="selectMood(this)"><span class="mood-e">🗺</span> Explored</button>
-      <button class="mood-chip" data-mood="🏫 Class day"  onclick="selectMood(this)"><span class="mood-e">🏫</span> Class</button>
-      <button class="mood-chip" data-mood="🌧 Rainy day"  onclick="selectMood(this)"><span class="mood-e">🌧</span> Rainy</button>
-      <button class="mood-chip" data-mood="🎌 Cultural"   onclick="selectMood(this)"><span class="mood-e">🎌</span> Cultural</button>
+      <button class="mood-chip" data-mood="🌟 Amazing"    onclick="sel(this)"><span class="me">🌟</span>Amazing</button>
+      <button class="mood-chip" data-mood="😊 Good day"   onclick="sel(this)"><span class="me">😊</span>Good</button>
+      <button class="mood-chip" data-mood="😤 Tough day"  onclick="sel(this)"><span class="me">😤</span>Tough</button>
+      <button class="mood-chip" data-mood="🍜 Food moment" onclick="sel(this)"><span class="me">🍜</span>Food</button>
+      <button class="mood-chip" data-mood="🗺 Explored"   onclick="sel(this)"><span class="me">🗺</span>Explored</button>
+      <button class="mood-chip" data-mood="🏫 Class day"  onclick="sel(this)"><span class="me">🏫</span>Class</button>
+      <button class="mood-chip" data-mood="🌧 Rainy day"  onclick="sel(this)"><span class="me">🌧</span>Rainy</button>
+      <button class="mood-chip" data-mood="🎌 Cultural"   onclick="sel(this)"><span class="me">🎌</span>Cultural</button>
     </div>
 
-    <!-- LOCATION -->
-    <label class="field-label">Where are you?</label>
+    <label class="field-lbl">Where are you?</label>
     <div class="loc-row">
-      <input class="field-input" id="jLoc" type="text"
-        placeholder="e.g. Beppu, Kyoto, Hiroshima…">
-      <button class="loc-detect-btn" onclick="detectLocation()">📍 Detect</button>
+      <input class="field-inp" id="jLoc" type="text" placeholder="e.g. Beppu, Kyoto, Hiroshima…">
+      <button class="loc-btn" onclick="detectLoc()">📍 Detect</button>
     </div>
-    <div class="loc-status">
-      <div class="loc-dot" id="locDot"></div>
-      <span id="locLabel">Tap Detect to use your GPS location</span>
-    </div>
+    <div class="loc-status"><div class="loc-dot" id="locDot"></div><span id="locLabel">Tap Detect to use GPS</span></div>
 
-    <!-- ENTRY -->
-    <label class="field-label">What happened today?</label>
-    <textarea class="field-textarea" id="jText"
-      placeholder="Write anything — what you saw, ate, felt, laughed at, want to remember forever…"></textarea>
+    <label class="field-lbl">What happened today?</label>
+    <textarea class="field-ta" id="jText" placeholder="Write anything — what you saw, ate, felt, laughed at, want to remember forever…"></textarea>
 
-    <!-- SAVE -->
-    <button class="save-btn" id="saveBtn" onclick="saveEntry()">
-      <span>✍️</span><span>Save to Journal</span>
-    </button>
-    <div class="save-feedback" id="saveFeedback"></div>
-    <div class="pin-toast" id="pinToast">
-      <span>📍</span><span id="pinToastMsg">Map pin dropped on the family guide!</span>
-    </div>
+    <button class="save-btn" id="saveBtn" onclick="saveEntry()"><span>✍️</span><span>Save to Journal</span></button>
+    <div class="save-fb" id="saveFb"></div>
+    <div class="pin-toast" id="pinToast"><span>📍</span><span id="pinMsg">Map pin dropped on the family guide!</span></div>
 
-    <!-- RECENT -->
-    <div class="recent-label">Recent Entries</div>
-    <div id="recentList">
-      <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No entries yet — write your first one above!</div>
-    </div>
+    <div class="recent-lbl">Recent Entries</div>
+    <div id="recentList"><div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No entries yet — write your first one above!</div></div>
+  </div>
 
+  <div class="j-disclaimer">
+    <strong>Public site</strong> — do not include passwords, confirmation numbers, or private details.
   </div>
 </div>
 
-<!-- ════════════════════════════════════
-     SUCCESS SCREEN
-════════════════════════════════════ -->
+<!-- ── SUCCESS ── -->
 <div class="screen success-screen" id="screenSuccess">
-  <div class="success-bg"></div>
-  <div class="success-bg-grad"></div>
-  <div class="success-content">
-    <div class="success-icon">✅</div>
-    <div class="success-title">Entry Saved!</div>
-    <div class="success-sub">Your family can see it now<br>on the main guide.</div>
-    <div class="success-preview" id="successPreview"></div>
-    <button class="new-entry-btn" onclick="newEntry()">✍️ Write Another</button>
+  <div class="suc-bg"></div>
+  <div class="suc-grad"></div>
+  <div class="suc-content">
+    <div class="suc-icon">✅</div>
+    <div class="suc-title">Entry Saved!</div>
+    <div class="suc-sub">Your family can see it now on the main guide.</div>
+    <div class="suc-preview" id="sucPreview"></div>
+    <button class="new-btn" onclick="newEntry()">✍️ Write Another</button>
   </div>
 </div>
 
 <script>
-const SUPABASE_URL  = 'https://fmlolwkndaqpxvfszswx.supabase.co';
-const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtbG9sd2tuZGFxcHh2ZnN6c3d4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDMzMTksImV4cCI6MjA5MzQ3OTMxOX0.mDg9MlJ83KP2lzsi_7jvPN1tLmRvupBtZcS0Sj8ITXo';
-const JOURNAL_PASSWORD = 'beppu2026';
-const SESSION_KEY      = 'journal_unlocked';
-
+const SUPABASE_URL = 'https://fmlolwkndaqpxvfszswx.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtbG9sd2tuZGFxcHh2ZnN6c3d4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDMzMTksImV4cCI6MjA5MzQ3OTMxOX0.mDg9MlJ83KP2lzsi_7jvPN1tLmRvupBtZcS0Sj8ITXo';
+const PWD = 'beppu2026', SKEY = 'journal_unlocked';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let mood = '', coords = null, droppedPin = null;
 
-let selectedMood   = '';
-let detectedCoords = null;
-let droppedPinId   = null;
-
-// City → map_visited location id mapping (matches main site)
 const CITY_MAP = {
-  'beppu':     'beppu',   'oita':      'beppu',
-  'fukuoka':   'fukuoka', 'hakata':    'fukuoka',
-  'hiroshima': 'hiroshima','miyajima':  'miyajima',
-  'kyoto':     'kyoto',   'nara':      'kyoto',
-  'osaka':     'osaka',   'kobe':      'osaka',
-  'tokyo':     'tokyo',   'shinjuku':  'tokyo',
-  'shibuya':   'tokyo',   'asakusa':   'tokyo',
-  'akihabara': 'tokyo',   'haneda':    'tokyo',
-  'yokohama':  'tokyo',
+  beppu:'beppu', oita:'beppu', fukuoka:'fukuoka', hakata:'fukuoka',
+  hiroshima:'hiroshima', miyajima:'miyajima', kyoto:'kyoto', nara:'kyoto',
+  osaka:'osaka', kobe:'osaka', tokyo:'tokyo', shinjuku:'tokyo',
+  shibuya:'tokyo', asakusa:'tokyo', akihabara:'tokyo', haneda:'tokyo', yokohama:'tokyo'
 };
+const PIN_NAMES = { beppu:'Beppu (APU)', fukuoka:'Fukuoka', hiroshima:'Hiroshima', miyajima:'Miyajima Island', kyoto:'Kyoto', osaka:'Osaka', tokyo:'Tokyo' };
 
-function resolvePin(locationStr) {
-  if (!locationStr) return null;
-  const lower = locationStr.toLowerCase();
-  for (const [kw, id] of Object.entries(CITY_MAP)) {
-    if (lower.includes(kw)) return id;
-  }
+function resolvePin(loc) {
+  if (!loc) return null;
+  const l = loc.toLowerCase();
+  for (const [k,v] of Object.entries(CITY_MAP)) { if (l.includes(k)) return v; }
   return null;
 }
 
-// ── LOCK ──
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function sel(btn) { document.querySelectorAll('.mood-chip').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); mood = btn.dataset.mood; }
+
 function checkLock() {
-  const val = document.getElementById('lockInput').value;
-  const err = document.getElementById('lockError');
-  if (val === JOURNAL_PASSWORD) {
-    sessionStorage.setItem(SESSION_KEY, '1');
+  const v = document.getElementById('lockInput').value;
+  if (v === PWD) {
+    sessionStorage.setItem(SKEY,'1');
     showScreen('screenJournal');
-    loadRecent();
-    updateHeaderDate();
+    loadRecent(); updateDate();
   } else {
-    err.textContent = 'Wrong password — try again';
+    document.getElementById('lockError').textContent = 'Wrong password — try again';
     document.getElementById('lockInput').value = '';
     document.getElementById('lockInput').focus();
   }
 }
+function lockOut() { sessionStorage.removeItem(SKEY); document.getElementById('lockInput').value=''; document.getElementById('lockError').textContent=''; showScreen('screenLock'); }
 
-function lockOut() {
-  sessionStorage.removeItem(SESSION_KEY);
-  document.getElementById('lockInput').value = '';
-  document.getElementById('lockError').textContent = '';
-  showScreen('screenLock');
-}
-
-// ── MOOD ──
-function selectMood(btn) {
-  document.querySelectorAll('.mood-chip').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  selectedMood = btn.dataset.mood;
-}
-
-// ── LOCATION DETECT ──
-async function detectLocation() {
-  const dot   = document.getElementById('locDot');
-  const lbl   = document.getElementById('locLabel');
-  const input = document.getElementById('jLoc');
-  dot.className = 'loc-dot';
-  lbl.textContent = 'Detecting…';
-  if (!navigator.geolocation) {
-    lbl.textContent = 'Location not available on this device';
-    dot.classList.add('error');
-    return;
-  }
+async function detectLoc() {
+  const dot=document.getElementById('locDot'), lbl=document.getElementById('locLabel'), inp=document.getElementById('jLoc');
+  dot.className='loc-dot'; lbl.textContent='Detecting…';
+  if (!navigator.geolocation) { dot.className='loc-dot err'; lbl.textContent='Not available'; return; }
   navigator.geolocation.getCurrentPosition(async pos => {
-    detectedCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+    coords={lat:pos.coords.latitude,lng:pos.coords.longitude};
     try {
-      const res  = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${detectedCoords.lat}&lon=${detectedCoords.lng}&format=json`);
-      const data = await res.json();
-      const parts = (data.display_name || '').split(',');
-      const place = parts.slice(0, 2).join(',').trim();
-      input.value = place;
-      lbl.textContent = place;
-      dot.classList.add('active');
-    } catch(e) {
-      input.value = `${detectedCoords.lat.toFixed(4)}, ${detectedCoords.lng.toFixed(4)}`;
-      dot.classList.add('active');
-      lbl.textContent = 'Location found';
-    }
-  }, () => {
-    dot.classList.add('error');
-    lbl.textContent = 'Could not detect — type it in manually';
-  }, { enableHighAccuracy: true, timeout: 10000 });
+      const d=await (await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json`)).json();
+      const place=(d.display_name||'').split(',').slice(0,2).join(',').trim();
+      inp.value=place; lbl.textContent=place; dot.className='loc-dot ok';
+    } catch { inp.value=`${coords.lat.toFixed(4)},${coords.lng.toFixed(4)}`; dot.className='loc-dot ok'; lbl.textContent='Location found'; }
+  }, ()=>{dot.className='loc-dot err';lbl.textContent='Could not detect — type manually';},{enableHighAccuracy:true,timeout:10000});
 }
 
-// ── DROP MAP PIN ──
-async function dropMapPin(locationStr) {
-  const locId = resolvePin(locationStr);
-  droppedPinId = locId;
-  if (!locId) return;
+async function dropPin(loc) {
+  const id=resolvePin(loc); droppedPin=id;
+  if (!id) return;
   try {
-    await sb.from('map_visited').upsert(
-      { location: locId, visited: true, updated_at: new Date().toISOString() },
-      { onConflict: 'location' }
-    );
-    // Update loc dot
-    const dot = document.getElementById('locDot');
-    const lbl = document.getElementById('locLabel');
-    dot.className = 'loc-dot pinned';
-    // Show pin toast
-    const toast = document.getElementById('pinToast');
-    const names = {
-      beppu:'Beppu (APU)', fukuoka:'Fukuoka', hiroshima:'Hiroshima',
-      miyajima:'Miyajima Island', kyoto:'Kyoto', osaka:'Osaka', tokyo:'Tokyo'
-    };
-    document.getElementById('pinToastMsg').textContent =
-      `📍 Map pin dropped for ${names[locId] || locId} on the family guide!`;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 4000);
-  } catch(e) {
-    console.error('Pin drop error:', e?.message || JSON.stringify(e));
-  }
+    await sb.from('map_visited').upsert({location:id,visited:true,updated_at:new Date().toISOString()},{onConflict:'location'});
+    document.getElementById('locDot').className='loc-dot pin';
+    document.getElementById('pinMsg').textContent=`📍 Map pin dropped for ${PIN_NAMES[id]||id} on the family guide!`;
+    const t=document.getElementById('pinToast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),4000);
+  } catch(e){console.error(e);}
 }
 
-// ── SAVE ──
 async function saveEntry() {
-  const text     = document.getElementById('jText').value.trim();
-  const loc      = document.getElementById('jLoc').value.trim();
-  const feedback = document.getElementById('saveFeedback');
-  const saveBtn  = document.getElementById('saveBtn');
-  if (!text) { feedback.textContent = 'Write something first!'; return; }
-
-  saveBtn.disabled = true;
-  feedback.textContent = 'Saving…';
-
-  const now    = new Date();
-  const jpTime = now.toLocaleString('en-US', {
-    timeZone:'Asia/Tokyo', month:'short', day:'numeric',
-    hour:'2-digit', minute:'2-digit'
-  });
-
-  const entry = {
-    id: Date.now().toString(),
-    name: 'Owen',
-    location: loc || 'Japan',
-    text,
-    mood: selectedMood || '📓 Entry',
-    japan_time: jpTime,
-    created_at: now.toISOString()
-  };
-
+  const text=document.getElementById('jText').value.trim();
+  const loc=document.getElementById('jLoc').value.trim();
+  const fb=document.getElementById('saveFb'), btn=document.getElementById('saveBtn');
+  if (!text){fb.textContent='Write something first!';return;}
+  btn.disabled=true; fb.textContent='Saving…';
+  const now=new Date();
+  const jpTime=now.toLocaleString('en-US',{timeZone:'Asia/Tokyo',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const entry={id:Date.now().toString(),name:'Owen',location:loc||'Japan',text,mood:mood||'📓 Entry',japan_time:jpTime,created_at:now.toISOString()};
   try {
-    const { error } = await sb.from('journal').insert(entry);
-    if (error) throw error;
-
-    // Drop map pin
-    const locId   = resolvePin(loc);
-    const pinNames = {
-      beppu:'Beppu (APU)', fukuoka:'Fukuoka', hiroshima:'Hiroshima',
-      miyajima:'Miyajima Island', kyoto:'Kyoto', osaka:'Osaka', tokyo:'Tokyo'
-    };
-    if (locId) await dropMapPin(loc);
-
-    // Build success preview
-    document.getElementById('successPreview').innerHTML = `
-      <div class="preview-mood">${(selectedMood || '📓').split(' ')[0]}</div>
-      ${loc ? `<div class="preview-loc">📍 ${loc} · ${jpTime}</div>` : `<div class="preview-loc">${jpTime}</div>`}
-      <div class="preview-text">"${text.length > 120 ? text.substring(0,120)+'…' : text}"</div>
-      ${locId ? `<div class="preview-pin">📍 Map pin dropped for ${pinNames[locId] || locId}</div>` : ''}
+    const{error}=await sb.from('journal').insert(entry);
+    if(error)throw error;
+    const pinId=resolvePin(loc);
+    if(loc)await dropPin(loc);
+    document.getElementById('sucPreview').innerHTML=`
+      <div class="suc-mood">${(mood||'📓').split(' ')[0]}</div>
+      <div class="suc-loc">${loc?'📍 '+loc+' · ':''} ${jpTime}</div>
+      <div class="suc-text">"${text.length>120?text.slice(0,120)+'…':text}"</div>
+      ${pinId?`<div class="suc-pin">📍 Map pin dropped for ${PIN_NAMES[pinId]||pinId}</div>`:''}
     `;
     showScreen('screenSuccess');
-  } catch(e) {
-    console.error(e);
-    saveBtn.disabled = false;
-    feedback.textContent = '⚠ Could not save — check your connection';
-  }
+  } catch(e){console.error(e);btn.disabled=false;fb.textContent='⚠ Could not save — check connection';}
 }
 
-// ── NEW ENTRY ──
 function newEntry() {
-  document.getElementById('jText').value        = '';
-  document.getElementById('jLoc').value         = '';
-  document.getElementById('saveFeedback').textContent = '';
-  document.getElementById('saveBtn').disabled   = false;
-  document.getElementById('locDot').className   = 'loc-dot';
-  document.getElementById('locLabel').textContent = 'Tap Detect to use your GPS location';
+  ['jText','jLoc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('saveFb').textContent='';
+  document.getElementById('saveBtn').disabled=false;
+  document.getElementById('locDot').className='loc-dot';
+  document.getElementById('locLabel').textContent='Tap Detect to use GPS';
   document.getElementById('pinToast').classList.remove('show');
-  document.querySelectorAll('.mood-chip').forEach(b => b.classList.remove('selected'));
-  selectedMood = ''; detectedCoords = null; droppedPinId = null;
-  showScreen('screenJournal');
-  loadRecent();
+  document.querySelectorAll('.mood-chip').forEach(b=>b.classList.remove('selected'));
+  mood=''; coords=null; droppedPin=null;
+  showScreen('screenJournal'); loadRecent();
 }
 
-// ── LOAD RECENT ──
 async function loadRecent() {
   try {
-    const { data } = await sb.from('journal').select('*')
-      .order('created_at', { ascending: false }).limit(6);
-    const list = document.getElementById('recentList');
-    if (!data || !data.length) {
-      list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No entries yet — write your first one above!</div>';
-      return;
-    }
-    list.innerHTML = data.map(e => {
-      const pinId  = resolvePin(e.location);
-      const pinBadge = pinId ? '<span class="entry-pin-badge">📍</span>' : '';
-      return `
-      <div class="entry-card">
-        <div class="entry-header">
-          <div class="entry-mood-loc">
-            <span class="entry-mood-emoji">${(e.mood || '📓').split(' ')[0]}</span>
-            <span class="entry-location">${e.location || 'Japan'}${pinBadge}</span>
+    const{data}=await sb.from('journal').select('*').order('created_at',{ascending:false}).limit(6);
+    const list=document.getElementById('recentList');
+    if(!data||!data.length){list.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No entries yet — write your first one above!</div>';return;}
+    list.innerHTML=data.map(e=>{
+      const pinId=resolvePin(e.location);
+      return `<div class="entry-card">
+        <div class="entry-hdr">
+          <div class="entry-ml">
+            <span class="entry-emoji">${(e.mood||'📓').split(' ')[0]}</span>
+            <span class="entry-loc">${e.location||'Japan'}${pinId?'<span class="entry-pin">📍</span>':''}</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <div class="entry-date">${e.japan_time || new Date(e.created_at).toLocaleDateString()}</div>
-            <button class="entry-delete" onclick="deleteEntry('${e.id}')">✕</button>
+            <div class="entry-date">${e.japan_time||new Date(e.created_at).toLocaleDateString()}</div>
+            <button class="entry-del" onclick="delEntry('${e.id}')">✕</button>
           </div>
         </div>
-        <div class="entry-text">${e.text.length > 150 ? e.text.substring(0,150)+'…' : e.text}</div>
+        <div class="entry-text">${e.text.length>150?e.text.slice(0,150)+'…':e.text}</div>
       </div>`;
     }).join('');
-  } catch(e) { console.error(e); }
+  } catch(e){console.error(e);}
 }
 
-async function deleteEntry(id) {
-  if (!confirm('Delete this entry?')) return;
-  try {
-    await sb.from('journal').delete().eq('id', id);
-    loadRecent();
-  } catch(e) { console.error(e); }
+async function delEntry(id) {
+  if(!confirm('Delete this entry?'))return;
+  try{await sb.from('journal').delete().eq('id',id);loadRecent();}catch(e){console.error(e);}
 }
 
-// ── UTILS ──
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+function updateDate() {
+  const el=document.getElementById('jHeaderDate');
+  if(!el)return;
+  el.textContent=new Date().toLocaleDateString('en-US',{timeZone:'Asia/Tokyo',weekday:'long',month:'long',day:'numeric'})+' · Japan Time';
 }
 
-function updateHeaderDate() {
-  const el = document.getElementById('jHeaderDate');
-  if (!el) return;
-  const now = new Date();
-  el.textContent = now.toLocaleDateString('en-US', {
-    timeZone:'Asia/Tokyo', weekday:'long', month:'long', day:'numeric'
-  }) + ' · Japan Time';
-}
-
-// ── INIT ──
-if (sessionStorage.getItem(SESSION_KEY) === '1') {
-  showScreen('screenJournal');
-  loadRecent();
-  updateHeaderDate();
-}
-document.getElementById('lockInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') checkLock();
-});
+if(sessionStorage.getItem(SKEY)==='1'){showScreen('screenJournal');loadRecent();updateDate();}
+document.getElementById('lockInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkLock();});
 </script>
 </body>
 </html>

@@ -441,6 +441,10 @@ function subscribeRealtime() {
     })
     .subscribe(s => { if (s === 'SUBSCRIBED') setSyncStatus('live'); });
 
+  sb.channel('tasks-live')
+    .on('postgres_changes', { event:'*', schema:'public', table:'tasks' }, () => { loadTasks(); })
+    .subscribe();
+
   sb.channel('itin-live')
     .on('postgres_changes', { event:'*', schema:'public', table:'itinerary' }, () => {
       loadCalendar();
@@ -936,6 +940,83 @@ function renderVisitedList() {
   list.innerHTML = visited.map(l =>
     `<span style="background:var(--red-light);color:var(--red);border-radius:16px;padding:5px 12px;font-size:13px;font-weight:600;">${l.emoji} ${l.name}</span>`
   ).join('');
+}
+
+
+// ─── CUSTOM TASKS ─────────────────────────────────────────
+async function addTask() {
+  const input = document.getElementById('taskInput');
+  const who   = document.getElementById('taskWho');
+  const text  = input?.value.trim();
+  if (!text) { input?.focus(); return; }
+  const task = {
+    id: Date.now().toString(),
+    text,
+    who: who?.value || 'other',
+    checked: false,
+    created_at: new Date().toISOString()
+  };
+  input.value = '';
+  // Optimistic render
+  renderTaskItem(task);
+  try {
+    await sb.from('tasks').insert(task);
+  } catch(e) {
+    console.error('Task add error:', e?.message || JSON.stringify(e));
+  }
+  loadTasks();
+}
+
+async function toggleTask(id, currentVal) {
+  try {
+    await sb.from('tasks').update({ checked: !currentVal }).eq('id', id);
+    loadTasks();
+  } catch(e) { console.error('Task toggle error:', e?.message || JSON.stringify(e)); }
+}
+
+async function deleteTask(id) {
+  try {
+    await sb.from('tasks').delete().eq('id', id);
+    loadTasks();
+  } catch(e) { console.error('Task delete error:', e?.message || JSON.stringify(e)); }
+}
+
+function renderTaskItem(task) {
+  const wrap = document.getElementById('taskList');
+  if (!wrap) return;
+  // remove empty placeholder
+  const empty = wrap.querySelector('[data-empty]');
+  if (empty) empty.remove();
+  const whoClass = ['owen','mom','dad'].includes(task.who) ? task.who : 'other';
+  const whoLabel = task.who.charAt(0).toUpperCase() + task.who.slice(1);
+  const div = document.createElement('div');
+  div.className = 'task-item';
+  div.dataset.id = task.id;
+  div.innerHTML = `
+    <div class="cb-wrap" style="margin-top:1px;">
+      <div class="cb-box${task.checked ? ' checked' : ''}" onclick="toggleTask('${task.id}',${task.checked})"></div>
+    </div>
+    <div class="cb-text${task.checked ? ' checked' : ''}" style="flex:1;">${task.text}</div>
+    <span class="task-by ${whoClass}">${whoLabel}</span>
+    <button class="task-del" onclick="deleteTask('${task.id}')" title="Delete">✕</button>
+  `;
+  wrap.appendChild(div);
+}
+
+async function loadTasks() {
+  const wrap = document.getElementById('taskList');
+  if (!wrap) return;
+  try {
+    const { data } = await sb.from('tasks').select('*').order('created_at', { ascending: true });
+    if (!data || !data.length) {
+      wrap.innerHTML = '<div data-empty style="text-align:center;color:var(--muted);font-size:13px;padding:10px 0;">No custom tasks yet</div>';
+      return;
+    }
+    wrap.innerHTML = '';
+    data.forEach(task => renderTaskItem(task));
+  } catch(e) {
+    console.error('Task load error:', e?.message || JSON.stringify(e));
+  }
 }
 
 // ─── INIT ─────────────────────────────────────────────────
