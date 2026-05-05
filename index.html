@@ -38,6 +38,7 @@
     <button class="nav-btn"        onclick="showTab('events')"><span class="nav-icon">🎌</span>Events</button>
     <button class="nav-btn"        onclick="showTab('journal')"><span class="nav-icon">📓</span>Journal</button>
     <button class="nav-btn"        onclick="showTab('info')"><span class="nav-icon">📖</span>Info</button>
+    <button class="nav-btn"        onclick="showTab('program')"><span class="nav-icon">🏫</span>Program</button>
   </nav>
 </div>
 
@@ -153,7 +154,7 @@
           <option value="dad">Dad</option>
           <option value="other">Other</option>
         </select>
-        <button class="task-add-btn" onclick="addTask()">Add Task</button>
+        <button class="task-add-btn" id="taskAddBtn" onclick="addTask()">Add Task</button>
       </div>
     </div>
     <div id="taskList"><div style="text-align:center;color:var(--muted);font-size:13px;padding:10px 0;">No custom tasks yet</div></div>
@@ -271,14 +272,14 @@
 <div class="section" id="flights">
   <h2>Owen's Flights <span class="kanji">飛行機</span></h2>
 
-  <div class="card" style="background:var(--navy);color:#fff;border:none;">
-    <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">Booking Summary</div>
-    <div style="font-size:17px;font-weight:700;">All Nippon Airways / United Airlines</div>
-    <div style="font-size:13px;color:rgba(255,255,255,.6);margin-top:4px;">Atlanta ↔ Fukuoka · Economy</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;border-top:1px solid rgba(255,255,255,.15);padding-top:14px;">
-      <div><div style="font-size:10px;color:rgba(255,255,255,.45);margin-bottom:3px;">ANA Confirmation</div><div style="font-weight:700;color:#f9c74f;">••••••</div></div>
-      <div><div style="font-size:10px;color:rgba(255,255,255,.45);margin-bottom:3px;">Expedia Itinerary</div><div style="font-weight:700;color:#f9c74f;">On file</div></div>
-      <div><div style="font-size:10px;color:rgba(255,255,255,.45);margin-bottom:3px;">Booking Status</div><div style="font-weight:700;color:#f9c74f;">Confirmed</div></div>
+  <div class="card" style="background:var(--sumi);border-color:var(--sumi);">
+    <div style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(237,229,213,.5);margin-bottom:6px;font-weight:700;">Booking Summary</div>
+    <div style="font-size:17px;font-weight:700;color:#fff;">All Nippon Airways / United Airlines</div>
+    <div style="font-size:13px;color:rgba(237,229,213,.6);margin-top:4px;">Atlanta ↔ Fukuoka &nbsp;·&nbsp; Economy</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;border-top:1px solid rgba(237,229,213,.15);padding-top:14px;">
+      <div><div style="font-size:10px;color:rgba(237,229,213,.45);margin-bottom:3px;">ANA Confirmation</div><div style="font-weight:700;color:var(--gold);">On file</div></div>
+      <div><div style="font-size:10px;color:rgba(237,229,213,.45);margin-bottom:3px;">Expedia Itinerary</div><div style="font-weight:700;color:var(--gold);">On file</div></div>
+      <div><div style="font-size:10px;color:rgba(237,229,213,.45);margin-bottom:3px;">Booking Status</div><div style="font-weight:700;color:#6db87a;">✓ Confirmed</div></div>
     </div>
   </div>
 
@@ -303,7 +304,7 @@
       <div class="flight-arrow"><div>✈ ──────</div><div class="flight-duration">1h 47m</div></div>
       <div class="flight-airport"><div class="flight-iata">IAD</div><div class="flight-city">Washington Dulles</div><div class="flight-time">7:17 AM</div><div style="font-size:11px;color:var(--muted);">Fri, May 15</div></div>
     </div>
-    <div class="flight-detail-row"><span><strong>Class:</strong> Economy (W)</span><span><strong>Layover at IAD:</strong> 4h 58m</span></div>
+    <div class="flight-detail-row"><span><strong>Layover at IAD:</strong> 4h 58m</span></div>
     <button class="flight-refresh" onclick="fetchFlight(0)">🔄 Refresh Live Status</button>
   </div>
 
@@ -318,7 +319,7 @@
       <div class="flight-arrow"><div>✈ ──────</div><div class="flight-duration">14h 5m</div></div>
       <div class="flight-airport"><div class="flight-iata">HND</div><div class="flight-city">Tokyo Haneda</div><div class="flight-city" style="font-size:10px;">Terminal 3</div><div class="flight-time">3:20 PM</div><div style="font-size:11px;color:var(--muted);">Sat, May 16</div></div>
     </div>
-    <div class="flight-detail-row"><span><strong>Class:</strong> Economy (W)</span><span><strong>Layover at HND:</strong> 2h 40m</span></div>
+    <div class="flight-detail-row"><span><strong>Layover at HND:</strong> 2h 40m</span></div>
     <div class="tip-block" style="margin-top:8px;font-size:12.5px;">Immigration clearance at Haneda. Full guidance shared with Owen directly.</div>
     <button class="flight-refresh" onclick="fetchFlight(1)">🔄 Refresh Live Status</button>
   </div>
@@ -334,7 +335,7 @@
       <div class="flight-arrow"><div>✈ ──────</div><div class="flight-duration">1h 55m</div></div>
       <div class="flight-airport"><div class="flight-iata">FUK</div><div class="flight-city">Fukuoka</div><div class="flight-city" style="font-size:10px;">Terminal D</div><div class="flight-time">7:55 PM</div><div style="font-size:11px;color:var(--muted);">Sat, May 16</div></div>
     </div>
-    <div class="flight-detail-row"><span><strong>Class:</strong> Economy (W)</span></div>
+    <div class="flight-detail-row"></div>
     <div class="good-block" style="margin-top:8px;font-size:12.5px;">Program rendezvous at <strong>Fukuoka Airport domestic terminal at 7:00 PM on May 17</strong>. Owen has a full free day May 17 to explore Fukuoka.</div>
     <button class="flight-refresh" onclick="fetchFlight(2)">🔄 Refresh Live Status</button>
   </div>
@@ -354,7 +355,7 @@
       <div class="flight-arrow"><div>✈ ──────</div><div class="flight-duration">1h 50m</div></div>
       <div class="flight-airport"><div class="flight-iata">HND</div><div class="flight-city">Tokyo Haneda</div><div class="flight-city" style="font-size:10px;">Terminal 2</div><div class="flight-time">12:35 PM</div><div style="font-size:11px;color:var(--muted);">Sun, Jul 26</div></div>
     </div>
-    <div class="flight-detail-row"><span><strong>Class:</strong> Economy (Q)</span><span><strong>Layover at HND:</strong> 3h 10m</span></div>
+    <div class="flight-detail-row"><span><strong>Layover at HND:</strong> 3h 10m</span></div>
     <div class="tip-block" style="margin-top:8px;font-size:12.5px;">Must be at Fukuoka Airport by 8:45 AM. Book Tokyo → Fukuoka domestic flight for Jul 25 evening.</div>
     <button class="flight-refresh" onclick="fetchFlight(3)">🔄 Refresh Live Status</button>
   </div>
@@ -370,7 +371,7 @@
       <div class="flight-arrow"><div>✈ ──────</div><div class="flight-duration">13h 5m</div></div>
       <div class="flight-airport"><div class="flight-iata">IAD</div><div class="flight-city">Washington Dulles</div><div class="flight-time">3:50 PM</div><div style="font-size:11px;color:var(--muted);">Sun, Jul 26</div></div>
     </div>
-    <div class="flight-detail-row"><span><strong>Class:</strong> Economy (Q)</span><span><strong>Layover at IAD:</strong> 1h 27m</span></div>
+    <div class="flight-detail-row"><span><strong>Layover at IAD:</strong> 1h 27m</span></div>
     <button class="flight-refresh" onclick="fetchFlight(4)">🔄 Refresh Live Status</button>
   </div>
 
@@ -385,7 +386,7 @@
       <div class="flight-arrow"><div>✈ ──────</div><div class="flight-duration">1h 59m</div></div>
       <div class="flight-airport"><div class="flight-iata">ATL</div><div class="flight-city">Atlanta, GA</div><div class="flight-city" style="font-size:10px;">Terminal N</div><div class="flight-time">7:16 PM</div><div style="font-size:11px;color:var(--muted);">Sun, Jul 26</div></div>
     </div>
-    <div class="flight-detail-row"><span><strong>Class:</strong> Economy (Q)</span></div>
+    <div class="flight-detail-row"></div>
     <div class="good-block" style="margin-top:8px;font-size:12.5px;">🏠 <strong>Owen arrives home 7:16 PM on July 26.</strong></div>
     <button class="flight-refresh" onclick="fetchFlight(5)">🔄 Refresh Live Status</button>
   </div>
@@ -432,7 +433,109 @@
     <span><span style="display:inline-block;width:10px;height:10px;background:var(--blue);border-radius:2px;margin-right:4px;"></span>Itinerary entries</span>
   </div>
   <div class="tip-block" style="margin-top:10px;">Program dates (purple) and flights (coral) are pre-loaded and locked. Add your own bookings and activities via the Supabase itinerary — they sync here automatically.</div>
+
+  <!-- Add to Calendar form -->
+  <div class="card" style="margin-top:16px;">
+    <div class="card-header"><div class="card-title">➕ Add to Calendar</div><div class="badge badge-navy">Personal</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <input class="form-input" id="calTitle2" type="text" placeholder="e.g. Hotel check-in">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select class="form-select" id="calType">
+          <option value="activity">🟢 Activity</option>
+          <option value="flight">🔵 Flight</option>
+          <option value="other">⚪ Other</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
+      <div class="form-group">
+        <label class="form-label">Start Date</label>
+        <input class="form-input" id="calStart" type="date" min="2026-05-15" max="2026-07-31">
+      </div>
+      <div class="form-group">
+        <label class="form-label">End Date (optional)</label>
+        <input class="form-input" id="calEnd" type="date" min="2026-05-15" max="2026-07-31">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Added by</label>
+        <select class="form-select" id="calWho">
+          <option value="Owen">Owen</option>
+          <option value="Mom">Mom</option>
+          <option value="Dad">Dad</option>
+          <option value="Family">Family</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label class="form-label">Notes (optional)</label>
+      <input class="form-input" id="calNotes" type="text" placeholder="e.g. Confirmation #, address…">
+    </div>
+    <button class="btn-primary" onclick="addCalendarEvent()">Add to Calendar</button>
+    <div id="calAddFeedback" style="font-size:12px;color:var(--muted);margin-top:8px;min-height:16px;"></div>
+  </div>
+
+  <!-- Upcoming added events list -->
+  <div id="calAddedList"></div>
 </div><!-- /calendar -->
+<!-- ═══════════════════════════════════════════════════════════
+     PROGRAM TAB
+     ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="program">
+  <h2>LBAT Program Schedule <span class="kanji">プログラム</span></h2>
+
+  <div class="alert-block">
+    <strong>Meet at Fukuoka Airport domestic terminal at 7:00 PM on Sunday May 17.</strong> Be there by 6:30 PM with all luggage. The bus to Beppu (APU) departs promptly — if you miss it, you are responsible for getting to campus independently.
+  </div>
+
+  <div class="card" style="background:var(--sumi);border-color:var(--sumi);">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div>
+        <div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(237,229,213,.45);margin-bottom:5px;font-weight:700;">Program Dates</div>
+        <div style="font-size:16px;font-weight:700;color:#fff;">May 17 – July 19, 2026</div>
+        <div style="font-size:12px;color:rgba(237,229,213,.55);margin-top:3px;">9 weeks · Beppu, Japan</div>
+      </div>
+      <div>
+        <div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(237,229,213,.45);margin-bottom:5px;font-weight:700;">Host Institution</div>
+        <div style="font-size:14px;font-weight:700;color:#fff;">APU — Ritsumeikan Asia Pacific University</div>
+        <div style="font-size:12px;color:rgba(237,229,213,.55);margin-top:3px;">Beppu, Oita Prefecture · Kyushu</div>
+      </div>
+      <div>
+        <div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(237,229,213,.45);margin-bottom:5px;font-weight:700;">Directors</div>
+        <div style="font-size:13px;font-weight:600;color:#fff;">Aki Matsushima &amp; Masato Kikuchi</div>
+        <div style="font-size:12px;color:rgba(237,229,213,.55);margin-top:3px;">Contact via LINE</div>
+      </div>
+      <div>
+        <div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(237,229,213,.45);margin-bottom:5px;font-weight:700;">Housing</div>
+        <div style="font-size:13px;font-weight:600;color:#fff;">AP House 1 &amp; 2</div>
+        <div style="font-size:12px;color:rgba(237,229,213,.55);margin-top:3px;">Single rooms · onsen · laundry on every floor</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Week selector inner tabs -->
+  <div class="inner-tabs" id="progWeekTabs">
+    <button class="inner-tab active" onclick="showProgWeek(0,this)">Arrival</button>
+    <button class="inner-tab" onclick="showProgWeek(1,this)">Week 1</button>
+    <button class="inner-tab" onclick="showProgWeek(2,this)">Week 2</button>
+    <button class="inner-tab" onclick="showProgWeek(3,this)">Week 3</button>
+    <button class="inner-tab" onclick="showProgWeek(4,this)">Week 4</button>
+    <button class="inner-tab" onclick="showProgWeek(5,this)">Week 5</button>
+    <button class="inner-tab" onclick="showProgWeek(6,this)">Week 6</button>
+    <button class="inner-tab" onclick="showProgWeek(7,this)">Week 7</button>
+    <button class="inner-tab" onclick="showProgWeek(8,this)">Week 8</button>
+    <button class="inner-tab" onclick="showProgWeek(9,this)">Week 9</button>
+  </div>
+
+  <div id="progWeekContent"></div>
+
+  <div class="tip-block" style="margin-top:14px;">
+    <strong>Rules from the orientation handout:</strong> You are expected to spend every night at AP House except during the Kagoshima trip, Fukuoka company visits, and the farm stay. Any other overnight away must be approved by Aki or Masato in advance. Back by midnight on regular nights.
+  </div>
+</div><!-- /program -->
 
 <!-- ═══════════════════════════════════════════════════════════
      EVENTS TAB
@@ -463,26 +566,7 @@
      ═══════════════════════════════════════════════════════════ -->
 <div class="section" id="journal">
   <h2>Travel Journal <span class="kanji">日記</span></h2>
-  <div class="tip-block">Owen — write here from Japan! Family can read your entries in real time. 🇯🇵</div>
-
-  <div class="journal-form">
-    <h3 style="margin-top:0;">✍ New Entry</h3>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Your Name</label>
-        <input class="form-input" id="jName" placeholder="e.g. Owen" type="text">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Location (optional)</label>
-        <input class="form-input" id="jLocation" placeholder="e.g. Beppu, Kyoto…" type="text">
-      </div>
-    </div>
-    <div class="form-group" style="margin-bottom:12px;">
-      <label class="form-label">Entry</label>
-      <textarea class="form-textarea" id="jText" placeholder="What happened today? What did you see, eat, feel?…" style="min-height:100px;"></textarea>
-    </div>
-    <button class="btn-primary" onclick="addJournalEntry()">Save Entry</button>
-  </div>
+  <div class="tip-block">Owen writes from Japan using the <a href="journal.html" target="_blank" style="font-weight:700;">journal page →</a>. Family reads entries here in real time. 🇯🇵</div>
 
   <div id="journalList">
     <div style="text-align:center;color:var(--muted);padding:20px;font-size:14px;">No entries yet — Owen can start writing when he arrives!</div>
@@ -515,50 +599,203 @@
 
   <!-- ARRIVAL -->
   <div class="inner-view" id="infoArrival">
-    <div class="card">
-      <div class="card-header"><div class="card-title">🛂 Immigration at Haneda</div></div>
-      <div class="tip-block">At immigration always say: <strong>"I am here for sightseeing and cultural study"</strong> or simply <strong>"Tourism."</strong> Full guidance shared with Owen directly.</div>
-      <div class="budget-row"><div class="budget-label">Visa type</div><div class="budget-amt">Visa waiver (90 days)</div></div>
-      <div class="budget-row"><div class="budget-label">Days in Japan</div><div class="budget-amt">71 days (May 16 – Jul 26)</div></div>
-      <div class="budget-row"><div class="budget-label">Return ticket</div><div class="budget-amt">Fukuoka → Atlanta, Jul 26</div></div>
+
+    <div class="card" style="background:var(--sumi);border-color:var(--sumi);">
+      <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(237,229,213,.5);margin-bottom:8px;">🗓 Your Arrival Timeline</div>
+      <div style="display:flex;flex-direction:column;gap:0;">
+        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(237,229,213,.1);">
+          <div style="font-size:11px;font-weight:700;color:rgba(237,229,213,.55);min-width:90px;">May 15 · 5:30 AM</div>
+          <div style="font-size:13px;color:#fff;">Depart Atlanta (ATL) on UA7103</div>
+        </div>
+        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(237,229,213,.1);">
+          <div style="font-size:11px;font-weight:700;color:rgba(237,229,213,.55);min-width:90px;">May 15 · 12:15 PM</div>
+          <div style="font-size:13px;color:#fff;">Depart Dulles (IAD) on NH101 → Tokyo Haneda</div>
+        </div>
+        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(237,229,213,.1);">
+          <div style="font-size:11px;font-weight:700;color:rgba(237,229,213,.55);min-width:90px;">May 16 · 3:20 PM</div>
+          <div style="font-size:13px;color:#fff;">Land Tokyo Haneda — immigration, baggage, Suica card</div>
+        </div>
+        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(237,229,213,.1);">
+          <div style="font-size:11px;font-weight:700;color:rgba(237,229,213,.55);min-width:90px;">May 16 · 6:00 PM</div>
+          <div style="font-size:13px;color:#fff;">Depart Haneda on NH267 → Fukuoka</div>
+        </div>
+        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(237,229,213,.1);">
+          <div style="font-size:11px;font-weight:700;color:rgba(237,229,213,.55);min-width:90px;">May 16 · 7:55 PM</div>
+          <div style="font-size:13px;color:#fff;">Land Fukuoka — check into hotel, explore, rest</div>
+        </div>
+        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(237,229,213,.1);">
+          <div style="font-size:11px;font-weight:700;color:rgba(237,229,213,.55);min-width:90px;">May 17 · Free day</div>
+          <div style="font-size:13px;color:#fff;">Explore Fukuoka — ramen, Ohori Park, Tenjin, Canal City</div>
+        </div>
+        <div style="display:flex;gap:12px;padding:8px 0;">
+          <div style="font-size:11px;font-weight:700;color:var(--gold);min-width:90px;">May 17 · 7:00 PM</div>
+          <div style="font-size:13px;font-weight:700;color:var(--gold);">⚠ PROGRAM RENDEZVOUS — Fukuoka Airport domestic terminal</div>
+        </div>
+      </div>
     </div>
+
     <div class="card">
-      <div class="card-header"><div class="card-title">🗾 May 17 Rendezvous</div></div>
-      <p>Owen lands Fukuoka <strong>May 16 at 7:55pm</strong>. He has a full free day May 17 to explore Fukuoka. Program meets at <strong>7:00pm May 17</strong> at Fukuoka Airport domestic terminal.</p>
-      <div class="alert-block">Arrive at domestic terminal by 6:30pm. Bus to Beppu departs promptly — do NOT be late.</div>
+      <div class="card-header"><div class="card-title">🛂 Step 1 — Immigration at Haneda</div><div class="badge badge-red">Critical</div></div>
+      <div class="alert-block"><strong>Always say: "I am here for sightseeing and cultural study."</strong> Do NOT say "study abroad" or "student" — LBAT is not a university exchange program. You are entering on a visa waiver as a tourist.</div>
+      <div class="budget-row"><div class="budget-label">Visa type</div><div class="budget-amt">Visa waiver · no stamp needed</div></div>
+      <div class="budget-row"><div class="budget-label">Allowed stay</div><div class="budget-amt">Up to 90 days</div></div>
+      <div class="budget-row"><div class="budget-label">Your stay</div><div class="budget-amt">71 days (May 16 – Jul 26)</div></div>
+      <div class="budget-row"><div class="budget-label">Return ticket</div><div class="budget-amt">Show Fukuoka → Atlanta, Jul 26</div></div>
+      <ul class="checklist" style="margin-top:12px;">
+        <li class="static">Have passport out and ready before reaching the officer</li>
+        <li class="static">Fill in the arrival card on the plane — or pre-register at Visit Japan Web</li>
+        <li class="static">Fingerprints and photo are taken at the counter — this is normal</li>
+        <li class="static">Follow signs to 入国審査 (Immigration) then 荷物受取 (Baggage Claim)</li>
+        <li class="static">After baggage: proceed to 税関 (Customs) — hand over customs card, walk through green lane if nothing to declare</li>
+      </ul>
+      <div class="tip-block">Pre-register at <a href="https://vjw-lp.digital.go.jp/en/" target="_blank">Visit Japan Web</a> before departure — shows a QR code that skips the paper form and cuts wait time significantly. Register both Immigration and Customs sections.</div>
     </div>
+
     <div class="card">
-      <div class="card-header"><div class="card-title">📋 Visit Japan Web</div></div>
-      <p>Pre-fill your entry and customs forms at <a href="https://vjw-lp.digital.go.jp/en/" target="_blank">services.digital.go.jp/en/visit-japan-web</a> before departure for faster immigration at Haneda.</p>
+      <div class="card-header"><div class="card-title">🚇 Step 2 — Get a Suica Card at Haneda</div><div class="badge badge-green">Do This First</div></div>
+      <p style="margin-bottom:12px;">Before leaving the airport, get a Suica IC card. It works on every train, subway, and bus in Japan and pays for convenience stores, vending machines, and coin lockers. You will use it every single day.</p>
+      <div class="budget-row"><div class="budget-label">Where to get it</div><div class="budget-amt">Any JR ticket machine, Terminal 3 arrivals</div></div>
+      <div class="budget-row"><div class="budget-label">Best option — iPhone</div><div class="budget-amt">Wallet app → Add Card → Suica (instant, no physical card)</div></div>
+      <div class="budget-row"><div class="budget-label">Load to start</div><div class="budget-amt">¥3,000–5,000 (~$20–35)</div></div>
+      <div class="budget-row"><div class="budget-label">Top up at</div><div class="budget-amt">Any JR machine or convenience store</div></div>
+      <div class="budget-row"><div class="budget-label">Works everywhere</div><div class="budget-amt">Tokyo · Fukuoka · Beppu · Hiroshima · Kyoto · Osaka</div></div>
+      <div class="tip-block">Tap your phone or card to the yellow reader at station gates. Tap in, tap out — fare calculated automatically. Never buy individual tickets while you have Suica.</div>
     </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">🏨 Step 3 — Getting to Your Hotel (Fukuoka, May 16)</div></div>
+      <p style="margin-bottom:12px;">After landing at Fukuoka Airport at 7:55 PM, you need to get to your hotel for the night. Fukuoka Airport is unusually convenient — it's directly on the subway line.</p>
+      <div class="budget-row"><div class="budget-label">🚇 Best option — Subway</div><div class="budget-amt">Kūkō Line from Fukuoka Airport → Hakata or Tenjin · 5–11 min · ¥260 (tap Suica)</div></div>
+      <div class="budget-row"><div class="budget-label">🚕 Taxi / GO App</div><div class="budget-amt">Direct to hotel with bags · ~¥1,200–1,800 · 15 min · easiest with heavy luggage</div></div>
+      <div class="budget-row"><div class="budget-label">Stay near</div><div class="budget-amt">Hakata or Tenjin area — central, easy subway access next day</div></div>
+      <div class="tip-block"><strong>Recommended hotels near Hakata Station:</strong> Dormy Inn Hakata · APA Hotel Hakata · Vessel Inn Hakata. All are under ¥8,000/night (~$55) and walking distance from the station.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">🗾 May 17 — Your Free Day in Fukuoka</div><div class="badge badge-blue">First Day Itinerary</div></div>
+      <p style="margin-bottom:14px;">You have a full free day before the program rendezvous at 7 PM. Fukuoka is one of Japan's best food and culture cities — perfect first-day Japan experience.</p>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">8:00 AM</div><div class="tl-body"><strong>Breakfast at a convenience store</strong> — 7-Eleven or Lawson near your hotel. Hot rice balls (おにぎり), egg sandwiches, milk tea. Welcome to Japan convenience culture.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">9:00 AM</div><div class="tl-body"><strong>Kushida Shrine</strong> (博多駅から徒歩10分) — One of Fukuoka's oldest shrines, home of the Hakata Gion Yamakasa festival. Free to enter. Great introduction to Japanese shrine culture. <a href="https://maps.app.goo.gl/kushida" target="_blank">10 min walk from Hakata Station</a></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">10:30 AM</div><div class="tl-body"><strong>Hakata Traditional Craft Center</strong> — Free exhibits on Hakata weaving, Hakata dolls, and local crafts. Small but worthwhile. Next door to Kushida.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">12:00 PM</div><div class="tl-body"><strong>Tonkotsu Ramen lunch</strong> — Fukuoka invented tonkotsu ramen. <strong>Ichiran Ramen</strong> (一蘭) has English menus and solo booth seating — perfect for first-timers. Or try <strong>Shin-Shin</strong> near Tenjin for the local favorite. Budget ¥900–1,200.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">1:30 PM</div><div class="tl-body"><strong>Ohori Park</strong> (大濠公園) — Take the subway to Ohori-koen Station. Beautiful lake park with walking paths, a small Japanese garden (¥250), and paddle boats. Great for jet lag recovery. Bring your convenience store coffee.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">3:30 PM</div><div class="tl-body"><strong>Canal City Hakata</strong> — Large indoor shopping and entertainment complex near Hakata Station. Good for browsing Japanese stores, picking up any forgotten items, and finding an ATM (7-Eleven ATM inside). Free to enter.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">5:30 PM</div><div class="tl-body"><strong>Head back to hotel</strong> — Collect all luggage. Check out if staying overnight. Make sure you have everything for 9 weeks.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">6:15 PM</div><div class="tl-body"><strong>Leave for Fukuoka Airport</strong> — Subway from Tenjin or Hakata Station to Fukuoka Airport, Domestic Terminal. Kūkō Line, ~5–11 min. Follow signs to 国内線 (Domestic).</div></div>
+        <div class="tl-item" style="margin-bottom:0;"><div class="tl-dot" style="background:var(--beni);box-shadow:0 0 0 2px var(--beni);"></div><div class="tl-date" style="color:var(--beni);">7:00 PM SHARP</div><div class="tl-body"><strong style="color:var(--beni);">LBAT Program Rendezvous — Fukuoka Airport, Domestic Arrivals</strong><br>Meet Aki, Masato, and 18 other Georgia Tech students. Bus to APU Beppu departs promptly. Do NOT be late.</div></div>
+      </div>
+    </div>
+
   </div>
 
   <!-- TRANSPORT -->
   <div class="inner-view" id="infoTransport" style="display:none;">
-    <div class="alert-block"><strong>Return flight departs Fukuoka July 26 at 10:45am.</strong> Owen needs a Tokyo → Fukuoka domestic flight the evening of July 25 via ANA Experience Japan Fare (ana.co.jp).</div>
+
     <div class="card">
-      <div class="card-header"><div class="card-title">🗺 Suggested Solo Travel Route</div></div>
-      <div class="timeline">
-        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 19</div><div class="tl-body">Program ends → Shinkansen to <strong>Hiroshima</strong> (~50 min via Hakata)</div></div>
-        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 19–20</div><div class="tl-body"><strong>Hiroshima</strong> — Peace Memorial Museum + day trip to <strong>Miyajima Island</strong></div></div>
-        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 21–24</div><div class="tl-body"><strong>Kyoto</strong> — Fushimi Inari, Arashiyama, Gion Ato Matsuri parade (Jul 24), day trip to Osaka</div></div>
-        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 22–25</div><div class="tl-body"><strong>Tokyo</strong> — Shibuya, Shinjuku, Akihabara, Senso-ji, Sumida Fireworks Jul 25</div></div>
-        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 25</div><div class="tl-body">Morning in Tokyo → <strong>ANA flight to Fukuoka</strong> evening. Stay near airport.</div></div>
-        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 26</div><div class="tl-body">Departs Fukuoka 10:45am → Atlanta 7:16pm 🏠</div></div>
-      </div>
+      <div class="card-header"><div class="card-title">🚇 IC Cards — The Most Important Thing</div><div class="badge badge-green">Do First</div></div>
+      <p style="margin-bottom:12px;">An IC card (Suica or ICOCA) is a rechargeable transit card that works on virtually every train, subway, and bus in Japan. It also pays at convenience stores, vending machines, and coin lockers. Get one at Haneda Airport on arrival and never look back.</p>
+      <div class="budget-row"><div class="budget-label">Suica — Tokyo &amp; nationwide</div><div class="budget-amt"><a href="https://www.jreast.co.jp/e/pass/suica.html" target="_blank">jreast.co.jp/suica</a></div></div>
+      <div class="budget-row"><div class="budget-label">Add to iPhone / Android</div><div class="budget-amt">Wallet app → Add Card → Suica · tap phone at gates</div></div>
+      <div class="budget-row"><div class="budget-label">How to use</div><div class="budget-amt">Tap yellow reader entering AND exiting — always tap out</div></div>
+      <div class="budget-row"><div class="budget-label">Top up</div><div class="budget-amt">Any JR ticket machine, convenience store, or in Wallet app</div></div>
+      <div class="tip-block">IC cards work in Fukuoka (Nimoca/Hayakaken), Beppu local buses, and all major cities. Suica is universally accepted everywhere. Load ¥3,000–5,000 to start. Keep ¥500–1,000 loaded at all times — gates will reject you on empty.</div>
     </div>
+
     <div class="card">
-      <div class="card-header"><div class="card-title">🚄 Skip the JR Pass — Buy Individual Tickets</div></div>
-      <p style="margin-bottom:12px;">Individual Shinkansen tickets via <a href="https://smart-ex.jp" target="_blank">smart-ex.jp</a> are cheaper than the JR Pass for Owen's route. Book at any JR ticket machine in Japan.</p>
-      <table>
-        <thead><tr><th>Route</th><th>Where to Book</th></tr></thead>
+      <div class="card-header"><div class="card-title">🚄 Shinkansen (Bullet Train)</div><div class="badge badge-blue">Intercity</div></div>
+      <p style="margin-bottom:12px;">The shinkansen connects major cities at 200–300 km/h. It's the backbone of long-distance Japan travel — punctual to the minute, comfortable, and surprisingly straightforward once you understand the system.</p>
+      <ul class="checklist">
+        <li class="static"><strong>Book at smart-ex.jp</strong> — Japan's official Shinkansen booking site. English interface, credit card, e-ticket on your phone. Best prices and reserved seats. <a href="https://smart-ex.jp/en/" target="_blank">smart-ex.jp/en</a></li>
+        <li class="static"><strong>Or buy at the station</strong> — JR ticket machines (green machines) have English menus. Select your destination, choose unreserved (自由席) for flexibility or reserved (指定席) to guarantee a seat.</li>
+        <li class="static"><strong>Unreserved vs reserved</strong> — Reserved costs ¥500–1,000 more but guarantees your seat. Unreserved is fine outside of Friday evenings and holiday weekends.</li>
+        <li class="static"><strong>Platforms</strong> — Follow the 新幹線 (Shinkansen) signs. Check your train name (e.g. Sakura, Kodama, Hikari, Nozomi) and car/seat number on your ticket.</li>
+        <li class="static"><strong>You do NOT need a JR Pass</strong> for Owen's travel route. Individual tickets via smart-ex.jp are cheaper. JR Pass only makes sense for very extensive nationwide travel.</li>
+      </ul>
+      <table style="margin-top:12px;">
+        <thead><tr><th>Route</th><th>Train</th><th>Approx. Time</th><th>Approx. Fare</th></tr></thead>
         <tbody>
-          <tr><td>Hakata → Hiroshima</td><td>smart-ex.jp or JR machine</td></tr>
-          <tr><td>Hiroshima → Kyoto</td><td>smart-ex.jp or JR machine</td></tr>
-          <tr><td>Kyoto → Tokyo</td><td>smart-ex.jp or JR machine</td></tr>
+          <tr><td>Hakata → Hiroshima</td><td>Sakura / Kodama</td><td>50 min – 1h 20m</td><td>~¥5,500</td></tr>
+          <tr><td>Hiroshima → Kyoto</td><td>Sakura / Nozomi</td><td>1h 15m – 1h 40m</td><td>~¥8,500</td></tr>
+          <tr><td>Kyoto → Tokyo</td><td>Hikari / Nozomi</td><td>2h 15m – 2h 45m</td><td>~¥13,500</td></tr>
+          <tr><td>Hakata → Tokyo</td><td>Nozomi (direct)</td><td>5h</td><td>~¥22,000</td></tr>
         </tbody>
       </table>
     </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">🚆 Local Trains &amp; Subways</div></div>
+      <p style="margin-bottom:12px;">Every city has its own subway and local rail network. All use the same IC card tap-in/tap-out system. Use Google Maps or Navitime for directions — both show exact train numbers, platforms, and which car to board.</p>
+      <ul class="checklist">
+        <li class="static"><strong>Fukuoka Subway</strong> — 3 lines covering the city. Airport Line goes directly to Fukuoka Airport. Tap Suica or buy tickets from machines. <a href="https://subway.city.fukuoka.lg.jp/eng/" target="_blank">subway.city.fukuoka.lg.jp</a></li>
+        <li class="static"><strong>Beppu — no subway</strong>. Use local buses (Kamenoi Bus) or taxis. APU has a campus shuttle between the hilltop campus and Beppu Station. IC card works on Kamenoi buses.</li>
+        <li class="static"><strong>Tokyo Metro / Toei</strong> — Tokyo's subway system. Two operators but Suica works on both. Very frequent — trains every 2–5 minutes most of the day. <a href="https://www.tokyometro.jp/en/" target="_blank">tokyometro.jp/en</a></li>
+        <li class="static"><strong>Kyoto — buses</strong>. Kyoto's main sightseeing network is buses, not subway. ¥230 flat fare, IC card works. Buy a ¥700 day pass at the bus terminal for unlimited rides.</li>
+        <li class="static"><strong>Hiroshima — trams (streetcars)</strong>. The historic tram network connects the station to Peace Park and the ferry terminal. ¥190 flat fare, IC card works.</li>
+        <li class="static"><strong>Navitime Japan</strong> — best app for trains. Shows exact platform, car number, transfer instructions, and real-time delays. Download before arriving. <a href="https://www.navitime.co.jp/pcstorage/html/japan_travel/english/" target="_blank">navitime.co.jp</a></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">🚌 Buses</div></div>
+      <ul class="checklist">
+        <li class="static"><strong>Long-distance highway buses</strong> — Cheap alternative to Shinkansen. Overnight buses save hotel costs. Book at <a href="https://www.bushikaku.net/en/" target="_blank">bushikaku.net/en</a> or <a href="https://www.willer.co.jp/en/" target="_blank">willer.co.jp/en</a>. Fukuoka → Osaka overnight is about ¥4,000–6,000.</li>
+        <li class="static"><strong>Local city buses</strong> — Pay with IC card (tap when boarding, tap when exiting) or exact cash. Most city buses announce stops in English in major cities.</li>
+        <li class="static"><strong>Beppu — Kamenoi Bus</strong> — The main local bus company in Beppu. IC card accepted. Runs between APU, Beppu Station, and the onsens. Ask the program directors for the relevant bus numbers from campus.</li>
+        <li class="static"><strong>Airport buses</strong> — Most airports have fixed-fare limousine bus services to city hotels. Cheaper than taxis for solo travelers, good when you have luggage. No reservation needed usually — buy at the bus counter on arrival.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">🚕 Taxis</div></div>
+      <ul class="checklist">
+        <li class="static"><strong>Hail on the street</strong> — Look for 空車 (kūsha = vacant) sign in the windshield, usually illuminated in red/green. Wave to stop. No need to open the door — rear doors open automatically.</li>
+        <li class="static"><strong>No tipping — ever.</strong> Tipping in Japan is considered rude. Pay the meter and leave.</li>
+        <li class="static"><strong>Payment</strong> — IC cards now accepted in most taxis in major cities. Cash always works. Credit card is hit or miss — confirm before getting in.</li>
+        <li class="static"><strong>Cost</strong> — Base fare ¥500–730, then ¥80–90 per 300m. Short 10-minute rides can easily reach ¥1,200–1,800. Tokyo taxis are among the most expensive in the world.</li>
+        <li class="static"><strong>Show your destination</strong> — Have it written in Japanese or pull up Google Maps and show the driver. Many drivers speak little English but will follow map directions.</li>
+      </ul>
+      <div class="tip-block">At Fukuoka Airport, look for the fixed-fare taxi desk in arrivals. A fixed fare to Hakata/Tenjin is cheaper than running the meter and you know the price upfront.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">📱 Rideshare Apps</div></div>
+      <div class="alert-block"><strong>Japan rideshare ≠ Uber in the US.</strong> All apps dispatch licensed taxi drivers — not private cars. You'll get a proper taxi with a professional driver.</div>
+      <ul class="checklist">
+        <li class="static"><strong>GO App</strong> — The dominant taxi app in Japan. Works in Fukuoka, Tokyo, Osaka, Kyoto, and most cities. English interface. Download before arriving. <a href="https://go.mo-t.com/en/" target="_blank">go.mo-t.com/en</a></li>
+        <li class="static"><strong>Uber Japan</strong> — Limited coverage. Available in Tokyo, Kyoto, Osaka, and a few others. More expensive than GO in most cases. Good as backup. <a href="https://www.uber.com/global/en/cities/japan/" target="_blank">uber.com</a></li>
+        <li class="static"><strong>DiDi Japan</strong> — Available in major cities. Similar to GO. Download at <a href="https://didimobility.co.jp/en/" target="_blank">didimobility.co.jp/en</a></li>
+        <li class="static"><strong>In Beppu</strong> — App-based services have limited coverage. Use street taxis or call a taxi from your hotel. Beppu is small enough that most destinations are ¥600–1,200 away.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">✈ Domestic Flights</div></div>
+      <p style="margin-bottom:12px;">Japan has an excellent domestic airline network. Short-haul flights can sometimes beat Shinkansen on price, especially with advance booking.</p>
+      <ul class="checklist">
+        <li class="static"><strong>ANA (All Nippon Airways)</strong> — <a href="https://www.ana.co.jp/en/us/" target="_blank">ana.co.jp/en</a> · Premium carrier, reliable, good English service. ANA Experience Japan Fare available for international visitors.</li>
+        <li class="static"><strong>JAL (Japan Airlines)</strong> — <a href="https://www.jal.co.jp/en/" target="_blank">jal.co.jp/en</a> · Similar to ANA. JAL Explorer Pass for international visitors.</li>
+        <li class="static"><strong>Peach Aviation</strong> — <a href="https://www.flypeach.com/en" target="_blank">flypeach.com</a> · Budget carrier. Fukuoka ↔ Tokyo from ¥4,000–8,000 if booked early. Bags cost extra.</li>
+        <li class="static"><strong>Jetstar Japan</strong> — <a href="https://www.jetstar.com/jp/en" target="_blank">jetstar.com/jp</a> · Another budget option. Check baggage fees carefully.</li>
+        <li class="static"><strong>Owen's key domestic leg</strong> — Tokyo → Fukuoka on Jul 25 for the July 26 international departure. Book the <strong>ANA Experience Japan Fare</strong> well in advance at ana.co.jp — available only to visitors with international tickets, from ~¥5,000.</li>
+      </ul>
+      <div class="alert-block"><strong>Book the Jul 25 Tokyo → Fukuoka flight NOW.</strong> Return flight departs Fukuoka July 26 at 10:45 AM — must arrive in Fukuoka the evening before.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">🗺 Solo Travel Route (Jul 19–26)</div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 19</div><div class="tl-body">Program ends at APU → Sonic Express to Hakata → <strong>Shinkansen Sakura to Hiroshima</strong> (~50 min, ~¥5,500)</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 19–20</div><div class="tl-body"><strong>Hiroshima</strong> — Peace Memorial Museum + Miyajima Island day trip by JR ferry</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 21</div><div class="tl-body"><strong>Shinkansen to Kyoto</strong> (~1h 20m from Hiroshima, ~¥8,500)</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 21–23</div><div class="tl-body"><strong>Kyoto</strong> — Fushimi Inari, Arashiyama, Nishiki Market, Gion. Day trip to Osaka (~30 min by Hankyu train)</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 22</div><div class="tl-body"><strong>Shinkansen to Tokyo</strong> (~2h 15m from Kyoto, ~¥13,500). Check in near Shinjuku or Asakusa.</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 22–25</div><div class="tl-body"><strong>Tokyo</strong> — Shibuya Crossing, Shinjuku at night, Akihabara, Senso-ji at dawn, Sumida Fireworks Jul 25</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Jul 25</div><div class="tl-body"><strong>Fly Tokyo → Fukuoka</strong> (evening flight via ANA/Peach). Stay near Fukuoka Airport.</div></div>
+        <div class="tl-item" style="margin-bottom:0;"><div class="tl-dot" style="background:var(--beni);box-shadow:0 0 0 2px var(--beni);"></div><div class="tl-date" style="color:var(--beni);">Jul 26 · 10:45 AM</div><div class="tl-body"><strong style="color:var(--beni);">NH248 Fukuoka → Tokyo Haneda</strong> — be at airport by 8:45 AM. Home by 7:16 PM EDT. 🏠</div></div>
+      </div>
+    </div>
+
   </div>
 
   <!-- MONEY -->
@@ -585,10 +822,7 @@
       <div class="budget-row"><div class="budget-label">Drinks, snacks, vending machines</div><div class="budget-amt">¥300–500 (~$2–3)</div></div>
       <div class="budget-total"><span>Daily total (moderate)</span><span style="color:var(--red)">~$15–27</span></div>
     </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">💵 Budget &amp; Card Details</div></div>
-      <div class="tip-block">Budget details and card strategy shared directly with the family.</div>
-    </div>
+
   </div>
 
   <!-- TIPS -->

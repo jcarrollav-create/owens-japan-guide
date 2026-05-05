@@ -151,7 +151,7 @@ let convDir = 'usd2jpy';
 const state = {};
 
 // ─── NAV ──────────────────────────────────────────────────
-const TABS = ['dashboard','prep','flights','calendar','events','journal','info'];
+const TABS = ['dashboard','prep','flights','calendar','events','journal','info','program'];
 
 function showTab(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -164,6 +164,7 @@ function showTab(id) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (id === 'calendar') loadCalendar();
   if (id === 'journal')  loadJournal();
+  if (id === 'program')  initProgram();
 }
 
 function showInner(id, btn) {
@@ -947,8 +948,13 @@ function renderVisitedList() {
 async function addTask() {
   const input = document.getElementById('taskInput');
   const who   = document.getElementById('taskWho');
+  const btn   = document.getElementById('taskAddBtn');
   const text  = input?.value.trim();
   if (!text) { input?.focus(); return; }
+
+  // Disable button while saving
+  if (btn) btn.disabled = true;
+
   const task = {
     id: Date.now().toString(),
     text,
@@ -956,37 +962,49 @@ async function addTask() {
     checked: false,
     created_at: new Date().toISOString()
   };
-  input.value = '';
-  // Optimistic render
-  renderTaskItem(task);
+
   try {
-    await sb.from('tasks').insert(task);
+    const { error } = await sb.from('tasks').insert(task);
+    if (error) throw error;
+    input.value = '';
+    // Only reload AFTER confirmed insert
+    await loadTasks();
   } catch(e) {
     console.error('Task add error:', e?.message || JSON.stringify(e));
+    const wrap = document.getElementById('taskList');
+    if (wrap) {
+      const errDiv = document.createElement('div');
+      errDiv.style.cssText = 'color:var(--beni);font-size:12px;padding:8px 0;';
+      const msg = e?.message || JSON.stringify(e);
+      if (msg.includes('does not exist') || msg.includes('42P01')) {
+        errDiv.textContent = '⚠ Setup needed: create a "tasks" table in Supabase. See instructions below.';
+      } else {
+        errDiv.textContent = '⚠ Could not save task: ' + msg;
+      }
+      wrap.prepend(errDiv);
+    }
+  } finally {
+    if (btn) btn.disabled = false;
   }
-  loadTasks();
 }
 
 async function toggleTask(id, currentVal) {
   try {
-    await sb.from('tasks').update({ checked: !currentVal }).eq('id', id);
-    loadTasks();
+    const { error } = await sb.from('tasks').update({ checked: !currentVal }).eq('id', id);
+    if (error) throw error;
+    await loadTasks();
   } catch(e) { console.error('Task toggle error:', e?.message || JSON.stringify(e)); }
 }
 
 async function deleteTask(id) {
   try {
-    await sb.from('tasks').delete().eq('id', id);
-    loadTasks();
+    const { error } = await sb.from('tasks').delete().eq('id', id);
+    if (error) throw error;
+    await loadTasks();
   } catch(e) { console.error('Task delete error:', e?.message || JSON.stringify(e)); }
 }
 
-function renderTaskItem(task) {
-  const wrap = document.getElementById('taskList');
-  if (!wrap) return;
-  // remove empty placeholder
-  const empty = wrap.querySelector('[data-empty]');
-  if (empty) empty.remove();
+function renderTaskItem(task, container) {
   const whoClass = ['owen','mom','dad'].includes(task.who) ? task.who : 'other';
   const whoLabel = task.who.charAt(0).toUpperCase() + task.who.slice(1);
   const div = document.createElement('div');
@@ -1000,23 +1018,288 @@ function renderTaskItem(task) {
     <span class="task-by ${whoClass}">${whoLabel}</span>
     <button class="task-del" onclick="deleteTask('${task.id}')" title="Delete">✕</button>
   `;
-  wrap.appendChild(div);
+  container.appendChild(div);
 }
 
 async function loadTasks() {
   const wrap = document.getElementById('taskList');
   if (!wrap) return;
   try {
-    const { data } = await sb.from('tasks').select('*').order('created_at', { ascending: true });
+    const { data, error } = await sb.from('tasks').select('*').order('created_at', { ascending: true });
+    if (error) throw error;
+    wrap.innerHTML = '';
     if (!data || !data.length) {
-      wrap.innerHTML = '<div data-empty style="text-align:center;color:var(--muted);font-size:13px;padding:10px 0;">No custom tasks yet</div>';
+      wrap.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:10px 0;">No custom tasks yet — add one above!</div>';
       return;
     }
-    wrap.innerHTML = '';
-    data.forEach(task => renderTaskItem(task));
+    data.forEach(task => renderTaskItem(task, wrap));
   } catch(e) {
     console.error('Task load error:', e?.message || JSON.stringify(e));
+    const msg = e?.message || JSON.stringify(e);
+    if (msg.includes('does not exist') || msg.includes('42P01')) {
+      wrap.innerHTML = `<div style="color:var(--beni);font-size:12.5px;line-height:1.6;padding:8px 0;">
+        ⚠ <strong>One-time setup needed.</strong> Create a <code>tasks</code> table in your Supabase project:<br><br>
+        Go to Supabase → Table Editor → New table → name it <strong>tasks</strong> → add columns:<br>
+        <code>id</code> (text, primary key) · <code>text</code> (text) · <code>who</code> (text) · <code>checked</code> (bool, default false) · <code>created_at</code> (timestamptz)
+      </div>`;
+    } else {
+      wrap.innerHTML = '<div style="color:var(--beni);font-size:12px;padding:8px 0;">⚠ Could not load tasks — check connection</div>';
+    }
   }
+}
+
+
+// ─── ADD CALENDAR EVENT ───────────────────────────────────
+async function addCalendarEvent() {
+  const title = document.getElementById('calTitle2')?.value.trim();
+  const start = document.getElementById('calStart')?.value;
+  const end   = document.getElementById('calEnd')?.value || null;
+  const type  = document.getElementById('calType')?.value || 'activity';
+  const who   = document.getElementById('calWho')?.value || 'Family';
+  const notes = document.getElementById('calNotes')?.value.trim() || null;
+  const fb    = document.getElementById('calAddFeedback');
+
+  if (!title) { if(fb) fb.textContent = 'Please enter a title'; return; }
+  if (!start) { if(fb) fb.textContent = 'Please pick a start date'; return; }
+  if (end && end < start) { if(fb) fb.textContent = 'End date must be on or after start date'; return; }
+
+  if (fb) fb.textContent = 'Saving…';
+  const entry = {
+    id: Date.now().toString(),
+    title,
+    start,
+    end: end || start,
+    type,
+    name: who,
+    notes,
+    created_at: new Date().toISOString()
+  };
+  try {
+    const { error } = await sb.from('itinerary').insert(entry);
+    if (error) throw error;
+    if (fb) fb.textContent = '✓ Added to calendar!';
+    setTimeout(() => { if(fb) fb.textContent = ''; }, 3000);
+    // clear fields
+    ['calTitle2','calStart','calEnd','calNotes'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.value = '';
+    });
+    loadCalendar();
+    loadCalendarEntries();
+  } catch(e) {
+    console.error('Calendar add error:', e?.message || JSON.stringify(e));
+    if (fb) fb.textContent = '⚠ Error: ' + (e?.message || JSON.stringify(e));
+  }
+}
+
+async function loadCalendarEntries() {
+  const wrap = document.getElementById('calAddedList');
+  if (!wrap) return;
+  try {
+    const { data } = await sb.from('itinerary').select('*').order('start', { ascending: true });
+    if (!data || !data.length) { wrap.innerHTML = ''; return; }
+    wrap.innerHTML = `
+      <h3 style="margin:16px 0 10px;">Your Added Events</h3>
+      ${data.map(e => `
+        <div class="task-item" style="align-items:center;">
+          <div class="cb-text" style="flex:1;">
+            <strong>${e.title}</strong>
+            <span style="font-size:11px;color:var(--muted);margin-left:6px;">${e.start}${e.end && e.end!==e.start?' → '+e.end:''}</span>
+          </div>
+          <span class="task-by ${e.name?.toLowerCase()||'other'}" style="flex-shrink:0;">${e.name||'Family'}</span>
+          <button class="task-del" onclick="deleteCalEntry('${e.id}')">✕</button>
+        </div>
+      `).join('')}
+    `;
+  } catch(e) { console.error('calEntries error:', e?.message||JSON.stringify(e)); }
+}
+
+async function deleteCalEntry(id) {
+  if (!confirm('Remove this calendar entry?')) return;
+  try {
+    await sb.from('itinerary').delete().eq('id', id);
+    loadCalendar();
+    loadCalendarEntries();
+  } catch(e) { console.error('delete cal error:', e?.message||JSON.stringify(e)); }
+}
+
+// ─── PROGRAM SCHEDULE ─────────────────────────────────────
+const PROG_WEEKS = [
+  {
+    label: 'Arrival',
+    dates: 'May 15–17, 2026',
+    days: [
+      { date:'Fri May 15', icon:'✈', label:'Depart Atlanta 5:30 AM · Arrive Dulles 7:17 AM · Depart Dulles 12:15 PM (NH101)' },
+      { date:'Sat May 16', icon:'🛬', label:'Arrive Tokyo Haneda 3:20 PM JST · Depart 6:00 PM on NH267 · Arrive Fukuoka 7:55 PM · Check into hotel' },
+      { date:'Sun May 17', icon:'🗾', label:'Free day — explore Fukuoka. Ramen, shrines, Ohori Park. ⚠ MEET at Fukuoka Airport Domestic Terminal at 7:00 PM SHARP. Bus to APU Beppu.' },
+    ]
+  },
+  {
+    label: 'Week 1',
+    dates: 'May 18–24, 2026',
+    note: 'Orientation week at APU Beppu. Move into AP House. Japanese placement test.',
+    days: [
+      { date:'Mon May 18', icon:'📝', label:'Pre-LBAT Japanese Language Test · Beppu City Tour orientation' },
+      { date:'Tue May 19', icon:'💬', label:'Conversation Practicum 1 · Beppu Orientation' },
+      { date:'Wed May 20', icon:'🗺', label:'Orientation / Scavenger Hunt around Beppu · オリエンテーション class' },
+      { date:'Thu May 21', icon:'📚', label:'Conversation Practicum 2 · 科学技術日本語 (Sci/Tech Japanese) 1 & 2' },
+      { date:'Fri May 22', icon:'📚', label:'Conversation Practicum 3 · 科学技術日本語 3 & 4' },
+      { date:'Sat May 23', icon:'🆓', label:'Free day' },
+      { date:'Sun May 24', icon:'🆓', label:'Free day' },
+    ]
+  },
+  {
+    label: 'Week 2',
+    dates: 'May 25–31, 2026',
+    note: 'Kagoshima multi-day trip — the big early-program adventure.',
+    days: [
+      { date:'Mon May 25', icon:'📚', label:'Conversation Practicum 4 · 科学技術日本語 5 & 6' },
+      { date:'Tue May 26', icon:'📚', label:'科学技術日本語 7 & 8' },
+      { date:'Wed May 27', icon:'🚌', label:'🗓 KAGOSHIMA TRIP begins — depart Beppu (program-arranged transport)' },
+      { date:'Thu May 28', icon:'🌋', label:'Kagoshima — Sakurajima volcano, Sengan-en garden, local culture' },
+      { date:'Fri May 29', icon:'🚌', label:'Kagoshima Trip day 3 — return to Beppu' },
+      { date:'Sat May 30', icon:'🆓', label:'Free day — recover, explore Beppu onsens' },
+      { date:'Sun May 31', icon:'🆓', label:'Free day' },
+    ]
+  },
+  {
+    label: 'Week 3',
+    dates: 'Jun 1–7, 2026',
+    note: 'Attack on Titan day trip and heavy coursework continues.',
+    days: [
+      { date:'Mon Jun 1',  icon:'📚', label:'Conversation Practicum 5 · 科学技術日本語 9 & 10' },
+      { date:'Tue Jun 2',  icon:'🚌', label:'🗓 日田 / Attack on Titan Day Trip (Hita City — inspiration for AoT)' },
+      { date:'Wed Jun 3',  icon:'📚', label:'科学技術日本語 11 & 12' },
+      { date:'Thu Jun 4',  icon:'📚', label:'Conversation Practicum 6 · 科学技術日本語 13 & 14' },
+      { date:'Fri Jun 5',  icon:'📚', label:'Conversation Practicum 7 · 科学技術日本語 15 & 16' },
+      { date:'Sat Jun 6',  icon:'🆓', label:'Free day' },
+      { date:'Sun Jun 7',  icon:'🆓', label:'Free day' },
+    ]
+  },
+  {
+    label: 'Week 4',
+    dates: 'Jun 8–14, 2026',
+    note: 'Cultural activities week — tea ceremony and calligraphy.',
+    days: [
+      { date:'Mon Jun 8',  icon:'🍵', label:'Conversation Practicum 8 · 科学技術日本語 17 · 茶道 Tea Ceremony' },
+      { date:'Tue Jun 9',  icon:'✍', label:'Conversation Practicum 9 · 科学技術日本語 18 & 19 · 書道 Calligraphy' },
+      { date:'Wed Jun 10', icon:'📚', label:'科学技術日本語 20 & 21' },
+      { date:'Thu Jun 11', icon:'📚', label:'科学技術日本語 22 & 23' },
+      { date:'Fri Jun 12', icon:'📚', label:'Conversation Practicum 10 · 科学技術日本語 24' },
+      { date:'Sat Jun 13', icon:'🆓', label:'Free day — rainy season begins (tsuyu). Explore Beppu's indoor onsens.' },
+      { date:'Sun Jun 14', icon:'🆓', label:'Free day' },
+    ]
+  },
+  {
+    label: 'Week 5',
+    dates: 'Jun 15–21, 2026',
+    note: 'Community engagement week + mandatory farm stay weekend.',
+    days: [
+      { date:'Mon Jun 15', icon:'🧘', label:'朝日寺 Zen Temple Visit · Elementary School Visit — cultural exchange with local kids' },
+      { date:'Tue Jun 16', icon:'💬', label:'Conversation Practicum 11' },
+      { date:'Wed Jun 17', icon:'🤝', label:'Conversation Practicum 12 · バディアクティビティ Buddy Activity with APU students' },
+      { date:'Thu Jun 18', icon:'📰', label:'Japan Today 1 & 2 (new course begins)' },
+      { date:'Fri Jun 19', icon:'🌾', label:'Conversation Practicum 13 · Japan Today 3 · 🗓 FARM STAY begins — depart to countryside host family farm' },
+      { date:'Sat Jun 20', icon:'🌾', label:'Farm Stay day 2 — working on the farm with host family. Bring your omiyage gift.' },
+      { date:'Sun Jun 21', icon:'🌾', label:'Farm Stay day 3 — return to APU' },
+    ]
+  },
+  {
+    label: 'Week 6',
+    dates: 'Jun 22–28, 2026',
+    note: 'Japan Today course intensifies. Rainy season peak.',
+    days: [
+      { date:'Mon Jun 22', icon:'📰', label:'Conversation Practicum 14 · Japan Today 4' },
+      { date:'Tue Jun 23', icon:'📰', label:'Japan Today 5 & 6' },
+      { date:'Wed Jun 24', icon:'📰', label:'Conversation Practicum 15 · Japan Today 7' },
+      { date:'Thu Jun 25', icon:'📰', label:'Japan Today 8 & 9' },
+      { date:'Fri Jun 26', icon:'📰', label:'Conversation Practicum 16 · Japan Today 10' },
+      { date:'Sat Jun 27', icon:'🆓', label:'Free day' },
+      { date:'Sun Jun 28', icon:'🆓', label:'Free day' },
+    ]
+  },
+  {
+    label: 'Week 7',
+    dates: 'Jun 29 – Jul 5, 2026',
+    note: 'Fukuoka overnight company visits. July 4th in Japan.',
+    days: [
+      { date:'Mon Jun 29', icon:'📰', label:'Conversation Practicum 17 · Japan Today 11' },
+      { date:'Tue Jun 30', icon:'📰', label:'Conversation Practicum 18 · Japan Today 12' },
+      { date:'Wed Jul 1',  icon:'🏢', label:'🗓 FUKUOKA TRIP — overnight company visits begin. Business casual required.' },
+      { date:'Thu Jul 2',  icon:'🏢', label:'Fukuoka company visits day 2 — return to Beppu' },
+      { date:'Fri Jul 3',  icon:'📚', label:'Classes resume at APU' },
+      { date:'Sat Jul 4',  icon:'🇺🇸', label:'Free day 🇺🇸 Happy 4th of July from Beppu!' },
+      { date:'Sun Jul 5',  icon:'🆓', label:'Free day' },
+    ]
+  },
+  {
+    label: 'Week 8',
+    dates: 'Jul 6–12, 2026',
+    note: 'Rakugo traditional comedy performance — a highlight of the program.',
+    days: [
+      { date:'Mon Jul 6',  icon:'📰', label:'Conversation Practicum 19 · Japan Today 13' },
+      { date:'Tue Jul 7',  icon:'📰', label:'Japan Today 14' },
+      { date:'Wed Jul 8',  icon:'📰', label:'Japan Today 15' },
+      { date:'Thu Jul 9',  icon:'🎭', label:'Japan Today 16 · 🗓 落語 RAKUGO PERFORMANCE — traditional Japanese comedic storytelling. A truly unique experience.' },
+      { date:'Fri Jul 10', icon:'📰', label:'Conversation Practicum 20 · Japan Today 17' },
+      { date:'Sat Jul 11', icon:'🆓', label:'Free day' },
+      { date:'Sun Jul 12', icon:'🆓', label:'Free day' },
+    ]
+  },
+  {
+    label: 'Week 9',
+    dates: 'Jul 13–19, 2026',
+    note: 'Final week — presentations, post-test, farewell ceremony. Program ends Jul 19.',
+    days: [
+      { date:'Mon Jul 13', icon:'🎤', label:'Conversation Presentations — Owen presents in Japanese · Japan Today 18' },
+      { date:'Tue Jul 14', icon:'📰', label:'Japan Today 19' },
+      { date:'Wed Jul 15', icon:'📰', label:'Japan Today 20' },
+      { date:'Thu Jul 16', icon:'📝', label:'Post-LBAT Japanese Language Test — shows progress after 9 weeks' },
+      { date:'Fri Jul 17', icon:'📰', label:'Japan Today wrap-up sessions' },
+      { date:'Sat Jul 18', icon:'🎉', label:'Free day — Program winds down. Pack up AP House.' },
+      { date:'Sun Jul 19', icon:'✅', label:'🗓 PROGRAM ENDS — depart APU. Solo travel begins. 9 weeks complete!' },
+    ]
+  },
+];
+
+let currentProgWeek = 0;
+
+function initProgram() {
+  showProgWeek(0, document.querySelector('#progWeekTabs .inner-tab'));
+}
+
+function showProgWeek(idx, btn) {
+  currentProgWeek = idx;
+  document.querySelectorAll('#progWeekTabs .inner-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const week = PROG_WEEKS[idx];
+  if (!week) return;
+  const wrap = document.getElementById('progWeekContent');
+  if (!wrap) return;
+
+  const typeIcon = { class:'📚', trip:'🚌', activity:'🎌', free:'🆓' };
+  const noteHtml = week.note ? `<div class="tip-block" style="margin-bottom:12px;">${week.note}</div>` : '';
+
+  wrap.innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">${week.label} &nbsp;<span style="font-weight:400;font-size:12px;color:var(--muted);">${week.dates}</span></div>
+      </div>
+      ${noteHtml}
+      ${week.days.map(d => `
+        <div class="sched-item">
+          <div class="sched-time" style="min-width:90px;font-size:10px;">${d.date}</div>
+          <div style="font-size:15px;flex-shrink:0;line-height:1;">${d.icon}</div>
+          <div class="sched-body">
+            <div class="sched-label">${d.label}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      ${idx > 0 ? `<button class="cal-nav" onclick="showProgWeek(${idx-1}, document.querySelectorAll('#progWeekTabs .inner-tab')[${idx-1}])">← Previous</button>` : '<span></span>'}
+      ${idx < PROG_WEEKS.length-1 ? `<button class="cal-nav" style="margin-left:auto;" onclick="showProgWeek(${idx+1}, document.querySelectorAll('#progWeekTabs .inner-tab')[${idx+1}])">Next →</button>` : ''}
+    </div>
+  `;
 }
 
 // ─── INIT ─────────────────────────────────────────────────
