@@ -252,15 +252,19 @@ function lockOut() { sessionStorage.removeItem(SKEY); document.getElementById('l
 async function detectLoc() {
   const dot=document.getElementById('locDot'), lbl=document.getElementById('locLabel'), inp=document.getElementById('jLoc');
   dot.className='loc-dot'; lbl.textContent='Detecting…';
-  if (!navigator.geolocation) { dot.className='loc-dot err'; lbl.textContent='Not available'; return; }
+  if (!navigator.geolocation) { dot.className='loc-dot err'; lbl.textContent='Not available on this device'; return; }
   navigator.geolocation.getCurrentPosition(async pos => {
     coords={lat:pos.coords.latitude,lng:pos.coords.longitude};
     try {
-      const d=await (await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json`)).json();
-      const place=(d.display_name||'').split(',').slice(0,2).join(',').trim();
-      inp.value=place; lbl.textContent=place; dot.className='loc-dot ok';
+      const d=await (await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json&addressdetails=1`)).json();
+      // Use structured address fields — city/town/village/suburb in order of preference
+      const a = d.address || {};
+      const city = a.city || a.town || a.village || a.suburb || a.county || a.state || '';
+      const country = a.country_code === 'jp' ? 'Japan' : (a.country || '');
+      const place = city ? (country ? `${city}, ${country}` : city) : (d.display_name||'').split(',').slice(0,2).join(',').trim();
+      inp.value=place; lbl.textContent='📍 ' + place; dot.className='loc-dot ok';
     } catch { inp.value=`${coords.lat.toFixed(4)},${coords.lng.toFixed(4)}`; dot.className='loc-dot ok'; lbl.textContent='Location found'; }
-  }, ()=>{dot.className='loc-dot err';lbl.textContent='Could not detect — type manually';},{enableHighAccuracy:true,timeout:10000});
+  }, (err)=>{dot.className='loc-dot err';lbl.textContent='Could not detect — type city name manually';},{enableHighAccuracy:true,timeout:10000});
 }
 
 async function dropPin(loc) {
@@ -282,17 +286,26 @@ async function saveEntry() {
   btn.disabled=true; fb.textContent='Saving…';
   const now=new Date();
   const jpTime=now.toLocaleString('en-US',{timeZone:'Asia/Tokyo',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-  const entry={id:Date.now().toString(),name:'Owen',location:loc||'Japan',text,mood:mood||'📓 Entry',japan_time:jpTime,created_at:now.toISOString()};
+  // Include coords if we detected GPS location
+  const entry={
+    id:Date.now().toString(),name:'Owen',
+    location:loc||'Japan',text,
+    mood:mood||'📓 Entry',japan_time:jpTime,
+    created_at:now.toISOString(),
+    lat: coords ? coords.lat : null,
+    lng: coords ? coords.lng : null
+  };
   try {
     const{error}=await sb.from('journal').insert(entry);
     if(error)throw error;
     const pinId=resolvePin(loc);
-    if(loc)await dropPin(loc);
+    // Only drop a pin if we have a recognised city
+    if(loc && pinId) await dropPin(loc);
     document.getElementById('sucPreview').innerHTML=`
       <div class="suc-mood">${(mood||'📓').split(' ')[0]}</div>
       <div class="suc-loc">${loc?'📍 '+loc+' · ':''} ${jpTime}</div>
       <div class="suc-text">"${text.length>120?text.slice(0,120)+'…':text}"</div>
-      ${pinId?`<div class="suc-pin">📍 Map pin dropped for ${PIN_NAMES[pinId]||pinId}</div>`:''}
+      ${pinId?`<div class="suc-pin">📍 Map pin dropped for ${PIN_NAMES[pinId]||pinId} on the family guide!</div>`:''}
     `;
     showScreen('screenSuccess');
   } catch(e){console.error(e);btn.disabled=false;fb.textContent='⚠ Could not save — check connection';}
@@ -312,16 +325,24 @@ function newEntry() {
 
 async function loadRecent() {
   try {
-    const{data}=await sb.from('journal').select('*').order('created_at',{ascending:false}).limit(6);
+    const{data}=await sb.from('journal').select('*').order('created_at',{ascending:false}).limit(10);
     const list=document.getElementById('recentList');
-    if(!data||!data.length){list.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No entries yet — write your first one above!</div>';return;}
+    if(!data||!data.length){
+      list.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No entries yet — write your first one above!</div>';
+      return;
+    }
     list.innerHTML=data.map(e=>{
       const pinId=resolvePin(e.location);
+      const cityDisplay = e.location && e.location !== 'Japan' ? e.location : '';
+      const pinBadge = pinId ? `<span class="entry-pin">📍 ${PIN_NAMES[pinId]||e.location}</span>` : '';
       return `<div class="entry-card">
         <div class="entry-hdr">
           <div class="entry-ml">
             <span class="entry-emoji">${(e.mood||'📓').split(' ')[0]}</span>
-            <span class="entry-loc">${e.location||'Japan'}${pinId?'<span class="entry-pin">📍</span>':''}</span>
+            <div>
+              ${cityDisplay ? `<div class="entry-loc">📍 ${cityDisplay}</div>` : ''}
+              ${pinBadge && !cityDisplay ? `<div class="entry-loc">${pinBadge}</div>` : ''}
+            </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div class="entry-date">${e.japan_time||new Date(e.created_at).toLocaleDateString()}</div>

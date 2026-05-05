@@ -455,15 +455,14 @@ function subscribeRealtime() {
   sb.channel('journal-live')
     .on('postgres_changes', { event:'*', schema:'public', table:'journal' }, () => {
       loadJournal();
+      // New journal entry might mean a new map pin should appear
+      loadMapState();
     }).subscribe();
 
   sb.channel('map-live')
     .on('postgres_changes', { event:'*', schema:'public', table:'map_visited' }, payload => {
-      const { location, visited } = payload.new || {};
-      if (!location) return;
-      mapState[location] = visited;
-      if (visited) markPinVisited(location); else unmarkPin(location);
-      renderVisitedList();
+      // Re-run full loadMapState so journal cross-check is always applied
+      loadMapState();
     }).subscribe();
 }
 
@@ -891,8 +890,20 @@ function loadGoogleMapsScript() {
 
 async function loadMapState() {
   try {
-    const { data } = await sb.from('map_visited').select('*');
-    (data || []).forEach(r => { mapState[r.location] = r.visited; });
+    // Only show pins that have a matching journal entry location
+    // This ensures the map starts empty and pins only appear when Owen writes
+    const [mapRes, journalRes] = await Promise.all([
+      sb.from('map_visited').select('*'),
+      sb.from('journal').select('location')
+    ]);
+    const visitedRows = mapRes.data || [];
+    const journalLocs = (journalRes.data || []).map(e => resolveJournalPin(e.location)).filter(Boolean);
+    const journalLocSet = new Set(journalLocs);
+
+    // A pin is active only if map_visited says visited AND there is a journal entry for it
+    visitedRows.forEach(r => {
+      mapState[r.location] = r.visited && journalLocSet.has(r.location);
+    });
     renderVisitedList();
     if (gmap) refreshMapMarkers();
   } catch(e) { console.error('Map state error:', e?.message || JSON.stringify(e)); }
